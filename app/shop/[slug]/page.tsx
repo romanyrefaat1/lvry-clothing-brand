@@ -17,6 +17,7 @@ import {
 
 import { useClothes } from "@/contexts/clothes-context";
 import { useBag } from "@/contexts/bag-context";
+import { Button } from "@/components/button";
 
 const categoryLabels: Record<string, string> = {
   top: "Top",
@@ -173,14 +174,15 @@ function PiecePageContent() {
               </span>
 
               {/* Expand image */}
-              <button
-                type="button"
-                onClick={() => setIsImageOpen(true)}
-                aria-label="View product image larger"
-                className="absolute right-5 top-5 z-20 flex h-10 w-10 items-center justify-center border border-black/15 bg-[#EFEBE4] transition-colors hover:bg-black hover:text-white sm:right-8 sm:top-8"
-              >
-                <Maximize2 size={15} strokeWidth={1.5} />
-              </button>
+              <Button
+  variant="secondary"
+  type="button"
+  onClick={() => setIsImageOpen(true)}
+  aria-label="View product image larger"
+  className="absolute right-5 top-5 z-20 flex h-10 w-10 items-center justify-center border border-black/15 hover:!text-bone sm:right-8 sm:top-8"
+>
+  <Maximize2 size={15} strokeWidth={1.5} />
+</Button>
             </div>
 
             {/* Image caption */}
@@ -244,11 +246,10 @@ function PiecePageContent() {
 
             {/* Actions */}
             <div className="mt-8 flex flex-col gap-3">
-              <button
-                type="button"
+              <Button
                 onClick={handleAddToBag}
                 disabled={!isReady}
-                className="group flex min-h-[58px] items-center justify-between bg-[#111111] px-6 text-[#EFEBE4] transition-colors hover:bg-[#FF4A1C] hover:text-[#111111] disabled:cursor-not-allowed disabled:opacity-50"
+                className="group flex min-h-[58px] items-center justify-between px-6 transition-colors disabled:cursor-not-allowed !bg-bone disabled:opacity-50"
               >
                 <span className="flex items-center gap-3 text-sm">
                   {isAdded ? (
@@ -263,7 +264,7 @@ function PiecePageContent() {
                   size={18}
                   className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
                 />
-              </button>
+              </Button>
 
               <Link
                 href={`/build?piece=${encodeURIComponent(piece.id)}`}

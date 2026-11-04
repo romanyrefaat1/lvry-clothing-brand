@@ -13,8 +13,8 @@ const footerLinks = [
   {
     title: "Developer",
     links: [
-      { label: "Portfolio", href: "https://romani.vercel.apphttps://romani.vercel.app/#contact" },
-      { label: "Contact", href: "https://romani.vercel.app/#contact" },
+      { label: "Portfolio", is_blank: true, href: "https://romani.vercel.apphttps://romani.vercel.app/#contact" },
+      { label: "Contact", is_blank: true, href: "https://romani.vercel.app/#contact" },
       // { label: "Privacy", href: "/privacy" },
     ],
   },
@@ -51,6 +51,7 @@ export function SiteFooter() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
+                      target={link.is_blank && link.is_blank == "blank" ? "_blank" : "_top"}
                       className="text-sm transition-opacity hover:opacity-50"
                     >
                       {link.label}

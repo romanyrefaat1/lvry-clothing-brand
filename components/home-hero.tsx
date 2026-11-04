@@ -1,69 +1,19 @@
-import Link from "next/link";
+"use client";
 
-function GarmentCutout() {
-  return (
-    <svg
-      viewBox="0 0 300 340"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      className="h-full w-full"
-      role="img"
-      aria-label="Illustration of a relaxed everyday shirt"
-    >
-      <path
-        d="M91 36L125 19H175L209 36L267 79L235 133L208 115V311H92V115L65 133L33 79L91 36Z"
-        fill="#3E5C8A"
-        stroke="#111111"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M125 19L150 53L175 19"
-        stroke="#111111"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M150 53V311"
-        stroke="#111111"
-        strokeWidth="1.5"
-        opacity=".55"
-      />
-      <path
-        d="M109 155H137V190H109V155Z"
-        stroke="#EFEBE4"
-        strokeWidth="1.5"
-        opacity=".7"
-      />
-      <path
-        d="M163 155H191V190H163V155Z"
-        stroke="#EFEBE4"
-        strokeWidth="1.5"
-        opacity=".7"
-      />
-      <path
-        d="M142 73H158"
-        stroke="#EFEBE4"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M142 91H158"
-        stroke="#EFEBE4"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M142 109H158"
-        stroke="#EFEBE4"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
+import Image from "next/image";
+import Link from "next/link";
+import { useClothes } from "@/contexts/clothes-context";
 
 export function HomeHero() {
+  const { getCollectionPieces } = useClothes();
+
+  const collectionPieces = getCollectionPieces("college-student");
+
+  const heroPiece =
+    collectionPieces.find((piece) => piece.category === "layer") ??
+    collectionPieces.find((piece) => piece.category === "top") ??
+    collectionPieces[0];
+
   return (
     <section className="overflow-hidden bg-bone">
       <div className="lvry-container grid min-h-[690px] grid-cols-1 items-center gap-12 py-16 md:grid-cols-[1.05fr_0.95fr] md:py-20 lg:min-h-[760px]">
@@ -71,6 +21,7 @@ export function HomeHero() {
         <div className="relative z-10 max-w-[660px]">
           <div className="mb-8 flex items-center gap-3">
             <span className="h-2 w-2 rounded-full bg-signal" />
+
             <p className="eyebrow text-muted">
               Independent clothing label / Est. concept
             </p>
@@ -81,13 +32,7 @@ export function HomeHero() {
             <br />
             EVERYDAY
             <br />
-            <span className="relative inline-block">
-              UNIFORM
-              <span className="absolute -right-5 top-1 text-[0.3em] text-signal">
-                ®
-              </span>
-            </span>
-            <span className="text-signal">.</span>
+            UNIFORM<span className="text-signal">.</span>
           </h1>
 
           <div className="mt-9 max-w-[390px]">
@@ -130,26 +75,44 @@ export function HomeHero() {
           {/* Denim fabric */}
           <div className="absolute right-[1%] top-[11%] h-[28%] w-[37%] rotate-[8deg] bg-denim p-3 shadow-paper">
             <div className="h-full border border-white/30" />
+
             <span className="absolute -bottom-6 right-0 font-mono text-[9px] uppercase tracking-widest text-muted">
-              Denim / 03
+              Denim / Fabric
             </span>
           </div>
 
-          {/* Main garment */}
+          {/* Actual catalog garment */}
           <div className="absolute left-[13%] top-[12%] z-10 flex h-[75%] w-[68%] rotate-[-4deg] items-center justify-center border border-ink/10 bg-[#F7F4EF] p-5 shadow-[8px_10px_0_rgba(17,17,17,0.12)]">
-            <div className="h-full w-full">
-              <GarmentCutout />
-            </div>
-            <span className="absolute bottom-4 left-4 font-mono text-[9px] uppercase tracking-widest text-ink/50">
-              Piece 001 / Overshirt
-            </span>
+            {heroPiece ? (
+              <>
+                <div className="relative h-full w-full">
+                  <Image
+                    src={heroPiece.image}
+                    alt={heroPiece.name}
+                    fill
+                    priority
+                    sizes="(max-width: 767px) 80vw, 40vw"
+                    className="object-contain"
+                  />
+                </div>
+
+                <span className="absolute bottom-4 left-4 max-w-[80%] truncate font-mono text-[9px] uppercase tracking-widest text-ink/60">
+                  {heroPiece.name}
+                </span>
+              </>
+            ) : (
+              <p className="font-mono text-xs uppercase text-muted">
+                No catalog pieces available
+              </p>
+            )}
           </div>
 
           {/* Canvas swatch */}
           <div className="absolute bottom-[8%] right-[4%] z-20 h-[26%] w-[34%] rotate-[7deg] bg-canvas p-3 shadow-paper">
             <div className="h-full border border-ink/20" />
+
             <span className="absolute bottom-5 left-5 font-mono text-[9px] uppercase tracking-widest">
-              Canvas / 02
+              Canvas / Fabric
             </span>
           </div>
 
@@ -184,9 +147,11 @@ export function HomeHero() {
           <span className="eyebrow whitespace-nowrap text-ink">
             Small range. On purpose.
           </span>
+
           <span className="eyebrow hidden whitespace-nowrap text-ink sm:block">
             Pieces of a uniform.
           </span>
+
           <span className="eyebrow whitespace-nowrap text-ink">
             Made to repeat.
           </span>

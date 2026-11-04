@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
+import { useClothes } from "@/contexts/clothes-context";
 
 /* ─────────────────────────────────────────
    SHARED DECORATIVE ELEMENTS
@@ -16,7 +18,7 @@ function SectionLabel({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="font-mono text-[10px] text-signal">{number}</span>
+      <span className="font-mono text-[10px] text-denim">{number}</span>
       <span className="h-px w-7 bg-border" />
       <span className="eyebrow text-muted">{children}</span>
     </div>
@@ -24,171 +26,33 @@ function SectionLabel({
 }
 
 function Arrow({ diagonal = false }: { diagonal?: boolean }) {
-  return (
-    <span aria-hidden="true" className="inline-block">
-      {diagonal ? "↗" : "→"}
-    </span>
-  );
+  return <span aria-hidden="true">{diagonal ? "↗" : "→"}</span>;
+}
+
+function formatCategory(category: string) {
+  return category.replaceAll("-", " ");
 }
 
 /* ─────────────────────────────────────────
-   PRODUCT VISUALS
-   Temporary illustrations until product
-   photography is available.
+   01 — THE PIECES
    ───────────────────────────────────────── */
-
-type ProductKind = "tee" | "overshirt" | "trousers" | "jacket";
-
-function ProductIllustration({
-  kind,
-  color,
-}: {
-  kind: ProductKind;
-  color: string;
-}) {
-  if (kind === "trousers") {
-    return (
-      <svg viewBox="0 0 240 280" className="h-full w-full" aria-hidden="true">
-        <path
-          d="M65 28H175L181 112L164 258H119L112 126L103 258H58L48 112L65 28Z"
-          fill={color}
-          stroke="#111"
-          strokeWidth="2"
-          strokeLinejoin="round"
-        />
-        <path d="M65 28H175L170 67H70L65 28Z" fill="#111" opacity=".08" />
-        <path d="M120 30V126" stroke="#111" strokeWidth="1.5" opacity=".5" />
-        <path d="M71 68H169" stroke="#111" strokeWidth="1.5" opacity=".5" />
-        <path d="M80 76L84 108" stroke="#111" strokeWidth="1" opacity=".35" />
-        <path d="M160 76L156 108" stroke="#111" strokeWidth="1" opacity=".35" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg viewBox="0 0 280 280" className="h-full w-full" aria-hidden="true">
-      <path
-        d="M83 37L119 22H161L197 37L252 83L222 137L195 118V253H85V118L58 137L28 83L83 37Z"
-        fill={color}
-        stroke="#111"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-
-      {kind !== "tee" && (
-        <>
-          <path
-            d="M119 22L140 57L161 22"
-            stroke="#111"
-            strokeWidth="2"
-            fill="none"
-          />
-          <path
-            d="M140 57V253"
-            stroke="#111"
-            strokeWidth="1.5"
-            opacity=".5"
-          />
-        </>
-      )}
-
-      {kind === "overshirt" && (
-        <>
-          <path d="M91 133H125V171H91V133Z" stroke="#111" strokeWidth="1.3" />
-          <path d="M155 133H189V171H155V133Z" stroke="#111" strokeWidth="1.3" />
-          <circle cx="145" cy="88" r="2" fill="#111" />
-          <circle cx="145" cy="112" r="2" fill="#111" />
-          <circle cx="145" cy="136" r="2" fill="#111" />
-        </>
-      )}
-
-      {kind === "jacket" && (
-        <>
-          <path d="M140 57V253" stroke="#111" strokeWidth="2" />
-          <path d="M88 180H122V218H88V180Z" stroke="#111" strokeWidth="1.5" />
-          <path d="M158 180H192V218H158V180Z" stroke="#111" strokeWidth="1.5" />
-          <path d="M126 22L140 57L154 22" stroke="#111" strokeWidth="1.5" />
-        </>
-      )}
-
-      {kind === "tee" && (
-        <path
-          d="M119 22C120 42 160 42 161 22"
-          stroke="#111"
-          strokeWidth="2"
-          fill="none"
-        />
-      )}
-    </svg>
-  );
-}
-
-/* ─────────────────────────────────────────
-   02 — THE PIECES
-   ───────────────────────────────────────── */
-
-const products: {
-  name: string;
-  description: string;
-  category: string;
-  kind: ProductKind;
-  color: string;
-  colorName: string;
-  number: string;
-  slug: string;
-}[] = [
-  {
-    name: "Relaxed tee",
-    description: "The usual starting point.",
-    category: "Tops",
-    kind: "tee",
-    color: "#E8E2D8",
-    colorName: "Bone",
-    number: "001",
-    slug: "relaxed-tee",
-  },
-  {
-    name: "Overshirt",
-    description: "For when a tee isn't enough.",
-    category: "Layers",
-    kind: "overshirt",
-    color: "#3E5C8A",
-    colorName: "Denim",
-    number: "002",
-    slug: "overshirt",
-  },
-  {
-    name: "Straight trousers",
-    description: "Goes with most things.",
-    category: "Bottoms",
-    kind: "trousers",
-    color: "#C9B79C",
-    colorName: "Canvas",
-    number: "003",
-    slug: "straight-trousers",
-  },
-  {
-    name: "Everyday jacket",
-    description: "An extra layer. Nothing complicated.",
-    category: "Outerwear",
-    kind: "jacket",
-    color: "#252525",
-    colorName: "Ink",
-    number: "004",
-    slug: "everyday-jacket",
-  },
-];
 
 export function CollectionSection() {
+  const { pieces } = useClothes();
+
+  const featuredPieces = pieces.slice(0, 4);
+
   return (
     <section className="py-24 md:py-32">
       <div className="lvry-container">
         <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
             <SectionLabel number="01">THE COLLECTION</SectionLabel>
+
             <h2 className="display-heading mt-6 text-5xl md:text-7xl">
               The pieces<span className="text-signal">.</span>
             </h2>
+
             <p className="mt-4 max-w-md text-sm leading-6 text-muted">
               Tops, layers and bottoms. Each with a place in the uniform.
             </p>
@@ -200,27 +64,26 @@ export function CollectionSection() {
         </div>
 
         <div className="grid grid-cols-1 gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-          {products.map((product) => (
+          {featuredPieces.map((piece, index) => (
             <Link
-              key={product.slug}
-              href={`/shop/${product.slug}`}
+              key={piece.id}
+              href={`/shop/${piece.id}`}
               className="group block"
             >
               <div className="relative aspect-[4/5] overflow-hidden bg-surface">
                 <span className="absolute left-4 top-4 z-10 font-mono text-[10px] text-muted">
-                  LVRY / {product.number}
+                  LVRY / {String(index + 1).padStart(3, "0")}
                 </span>
 
-                <div className="absolute inset-0 flex items-center justify-center p-8 transition-transform duration-500 group-hover:scale-[1.06]">
-                  <ProductIllustration
-                    kind={product.kind}
-                    color={product.color}
+                <div className="absolute inset-0 p-8 transition-transform duration-500 group-hover:scale-[1.04]">
+                  <Image
+                    src={piece.image}
+                    alt={piece.name}
+                    fill
+                    sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 25vw"
+                    className="object-contain p-8"
                   />
                 </div>
-
-                <span className="absolute bottom-4 right-4 font-mono text-[9px] uppercase tracking-wider text-muted">
-                  {product.colorName}
-                </span>
 
                 <span className="absolute bottom-4 left-4 translate-y-2 bg-ink px-3 py-2 text-[10px] text-bone opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
                   View details <Arrow diagonal />
@@ -228,56 +91,97 @@ export function CollectionSection() {
               </div>
 
               <div className="mt-4 flex items-start justify-between gap-3">
-                <div>
-                  <h3 className="text-sm font-medium">{product.name}</h3>
-                  <p className="mt-1 text-xs text-muted">
-                    {product.description}
-                  </p>
-                </div>
-                <span className="eyebrow text-muted">{product.category}</span>
+                <h3 className="text-sm font-medium">{piece.name}</h3>
+
+                <span className="eyebrow shrink-0 text-muted">
+                  {formatCategory(piece.category)}
+                </span>
               </div>
             </Link>
           ))}
         </div>
 
-        <p className="mt-8 border-t border-border pt-4 font-mono text-[10px] text-muted">
-          PRODUCT ILLUSTRATIONS / DEMO CONTENT
-        </p>
+        {featuredPieces.length === 0 && (
+          <p className="py-12 text-sm text-muted">
+            The collection is currently empty.
+          </p>
+        )}
       </div>
     </section>
   );
 }
 
 /* ─────────────────────────────────────────
-   03 — BUILDER PREVIEW
+   02 — BUILDER PREVIEW
    ───────────────────────────────────────── */
 
-const outfitOptions = {
-  Top: ["Relaxed tee", "Long sleeve tee", "Everyday shirt"],
-  Layer: ["Overshirt", "Knit layer", "No layer"],
-  Bottom: ["Straight trousers", "Relaxed trousers", "Shorts"],
-};
+const builderSlots = [
+  { key: "top", label: "Top", categories: ["top"] },
+  { key: "layer", label: "Layer", categories: ["layer", "outerwear"] },
+  { key: "bottom", label: "Bottom", categories: ["bottom"] },
+] as const;
 
-type OutfitSlot = keyof typeof outfitOptions;
+type BuilderSlot = (typeof builderSlots)[number]["key"];
+
+type BuilderSelection = Record<BuilderSlot, string | null>;
 
 export function BuilderPreview() {
-  const [outfit, setOutfit] = useState<Record<OutfitSlot, string>>({
-    Top: "Relaxed tee",
-    Layer: "Overshirt",
-    Bottom: "Straight trousers",
-  });
+  const { pieces, getPiece } = useClothes();
 
-  const [activeSlot, setActiveSlot] = useState<OutfitSlot>("Top");
+  const [outfit, setOutfit] = useState<BuilderSelection>(() => ({
+    top: pieces.find((piece) => piece.category === "top")?.id ?? null,
+    layer:
+      pieces.find(
+        (piece) =>
+          piece.category === "layer" || piece.category === "outerwear",
+      )?.id ?? null,
+    bottom: pieces.find((piece) => piece.category === "bottom")?.id ?? null,
+  }));
 
-  const slots: OutfitSlot[] = ["Top", "Layer", "Bottom"];
+  const [activeSlot, setActiveSlot] = useState<BuilderSlot>("top");
 
-  function cyclePiece(slot: OutfitSlot) {
-    const options = outfitOptions[slot];
-    const currentIndex = options.indexOf(outfit[slot]);
-    const next = options[(currentIndex + 1) % options.length];
+  function cyclePiece(slot: BuilderSlot) {
+    const slotConfig = builderSlots.find((item) => item.key === slot);
 
-    setOutfit((current) => ({ ...current, [slot]: next }));
+    if (!slotConfig) return;
+
+    const options = pieces.filter((piece) =>
+      slotConfig.categories.some((category) => piece.category === category),
+    );
+
+    if (options.length === 0) return;
+
+    const currentIndex = options.findIndex(
+      (piece) => piece.id === outfit[slot],
+    );
+
+    const nextIndex = (currentIndex + 1) % options.length;
+
+    setOutfit((current) => ({
+      ...current,
+      [slot]: options[nextIndex].id,
+    }));
   }
+
+  function resetOutfit() {
+    setOutfit({
+      top: pieces.find((piece) => piece.category === "top")?.id ?? null,
+      layer:
+        pieces.find(
+          (piece) =>
+            piece.category === "layer" || piece.category === "outerwear",
+        )?.id ?? null,
+      bottom: pieces.find((piece) => piece.category === "bottom")?.id ?? null,
+    });
+
+    setActiveSlot("top");
+  }
+
+  const selectedPieces = {
+    top: outfit.top ? getPiece(outfit.top) : undefined,
+    layer: outfit.layer ? getPiece(outfit.layer) : undefined,
+    bottom: outfit.bottom ? getPiece(outfit.bottom) : undefined,
+  };
 
   return (
     <section className="overflow-hidden bg-ink py-24 text-bone md:py-32">
@@ -327,90 +231,93 @@ export function BuilderPreview() {
               </div>
 
               <div className="grid min-h-[290px] grid-cols-[1fr_0.8fr] items-center gap-4 py-6 md:min-h-[340px]">
-                <div className="relative flex h-full flex-col items-center justify-center">
-                  <div className="relative z-20 w-[78%] max-w-[210px] -rotate-3 border border-ink/10 bg-[#F7F4EF] p-3 shadow-paper">
-                    <div className="aspect-[4/4]">
-                      <ProductIllustration
-                        kind="tee"
-                        color="#E8E2D8"
-                      />
-                    </div>
-                    <span className="block pt-2 text-center font-mono text-[9px] uppercase">
-                      {outfit.Top}
-                    </span>
-                  </div>
+                <div className="flex min-w-0 flex-col items-center justify-center">
+                  {builderSlots.map((slot, index) => {
+                    const piece = selectedPieces[slot.key];
 
-                  <div className="relative z-10 -mt-5 w-[72%] max-w-[190px] rotate-2 border border-ink/10 bg-[#F7F4EF] p-3 shadow-paper">
-                    <div className="aspect-[4/3]">
-                      <ProductIllustration
-                        kind="overshirt"
-                        color="#3E5C8A"
-                      />
-                    </div>
-                    <span className="block pt-2 text-center font-mono text-[9px] uppercase">
-                      {outfit.Layer}
-                    </span>
-                  </div>
+                    return (
+                      <div
+                        key={slot.key}
+                        className={`relative w-full max-w-[210px] border border-ink/10 bg-[#F7F4EF] p-3 shadow-paper ${
+                          index === 0
+                            ? "z-30 -rotate-3"
+                            : index === 1
+                              ? "z-20 -mt-5 rotate-2"
+                              : "z-10 -mt-5 -rotate-2"
+                        }`}
+                      >
+                        <div className="relative aspect-square">
+                          {piece ? (
+                            <Image
+                              src={piece.image}
+                              alt={piece.name}
+                              fill
+                              sizes="210px"
+                              className="object-contain"
+                            />
+                          ) : (
+                            <div className="flex h-full items-center justify-center text-center font-mono text-[10px] uppercase text-muted">
+                              No {slot.label.toLowerCase()} available
+                            </div>
+                          )}
+                        </div>
 
-                  <div className="relative z-0 -mt-5 w-[65%] max-w-[170px] -rotate-2 border border-ink/10 bg-[#F7F4EF] p-3 shadow-paper">
-                    <div className="aspect-[4/3]">
-                      <ProductIllustration
-                        kind="trousers"
-                        color="#C9B79C"
-                      />
-                    </div>
-                    <span className="block pt-2 text-center font-mono text-[9px] uppercase">
-                      {outfit.Bottom}
-                    </span>
-                  </div>
+                        <span className="block truncate pt-2 text-center font-mono text-[9px] uppercase">
+                          {piece?.name ?? `No ${slot.label}`}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
 
-                <div className="flex flex-col gap-3">
+                <div className="flex min-w-0 flex-col gap-3">
                   <span className="eyebrow mb-1 text-muted">
                     CHANGE A PIECE
                   </span>
 
-                  {slots.map((slot) => (
-                    <button
-                      key={slot}
-                      type="button"
-                      onClick={() => {
-                        setActiveSlot(slot);
-                        cyclePiece(slot);
-                      }}
-                      className={`border p-3 text-left transition-colors ${
-                        activeSlot === slot
-                          ? "border-signal bg-signal/10"
-                          : "border-ink/15 hover:border-ink/50"
-                      }`}
-                    >
-                      <span className="block font-mono text-[9px] uppercase text-muted">
-                        {slot}
-                      </span>
-                      <span className="mt-1 block text-xs font-medium">
-                        {outfit[slot]}
-                      </span>
-                      <span className="mt-2 block text-[10px] text-muted">
-                        Change <Arrow />
-                      </span>
-                    </button>
-                  ))}
+                  {builderSlots.map((slot) => {
+                    const piece = selectedPieces[slot.key];
+
+                    return (
+                      <button
+                        key={slot.key}
+                        type="button"
+                        onClick={() => {
+                          setActiveSlot(slot.key);
+                          cyclePiece(slot.key);
+                        }}
+                        className={`border p-3 text-left transition-colors ${
+                          activeSlot === slot.key
+                            ? "border-signal bg-signal/10"
+                            : "border-ink/15 hover:border-ink/50"
+                        }`}
+                      >
+                        <span className="block font-mono text-[9px] uppercase text-muted">
+                          {slot.label}
+                        </span>
+
+                        <span className="mt-1 block truncate text-xs font-medium">
+                          {piece?.name ?? "No piece available"}
+                        </span>
+
+                        <span className="mt-2 block text-[10px] text-muted">
+                          Change <Arrow />
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               <div className="flex items-center justify-between border-t border-ink/15 pt-4">
                 <span className="font-mono text-[9px] uppercase text-muted">
-                  {activeSlot} selected
+                  {builderSlots.find((slot) => slot.key === activeSlot)?.label}{" "}
+                  selected
                 </span>
+
                 <button
                   type="button"
-                  onClick={() =>
-                    setOutfit({
-                      Top: "Relaxed tee",
-                      Layer: "Overshirt",
-                      Bottom: "Straight trousers",
-                    })
-                  }
+                  onClick={resetOutfit}
                   className="text-xs underline underline-offset-4 hover:text-denim"
                 >
                   Reset canvas
@@ -429,94 +336,40 @@ export function BuilderPreview() {
 }
 
 /* ─────────────────────────────────────────
-   04 — EDITORIAL
+   03 — EDITORIAL
    ───────────────────────────────────────── */
 
-const editorialLooks = [
-  {
-    number: "01",
-    title: "The usual",
-    description: "A tee and a pair of trousers. You probably know this one.",
-    background: "#D8D0C3",
-    shirt: "#EDE9E1",
-    trousers: "#3E5C8A",
-    note: "Monday, probably.",
-  },
-  {
-    number: "02",
-    title: "One more layer",
-    description: "The overshirt goes on. Not much else changes.",
-    background: "#C9B79C",
-    shirt: "#3E5C8A",
-    trousers: "#252525",
-    note: "A little colder.",
-  },
-  {
-    number: "03",
-    title: "A little more coverage",
-    description: "Same starting point. An extra layer for the way back.",
-    background: "#D9DDE2",
-    shirt: "#252525",
-    trousers: "#C9B79C",
-    note: "Later in the day.",
-  },
-];
-
-function EditorialIllustration({
-  look,
-}: {
-  look: (typeof editorialLooks)[number];
-}) {
-  return (
-    <div
-      className="relative flex aspect-[4/5] items-center justify-center overflow-hidden"
-      style={{ backgroundColor: look.background }}
-    >
-      <div className="absolute left-5 top-5 font-mono text-[10px] text-ink/60">
-        LVRY / LOOK {look.number}
-      </div>
-
-      <div className="relative flex h-[70%] w-[65%] flex-col items-center justify-center">
-        <div
-          className="relative z-20 h-[55%] w-[75%] -rotate-3"
-          style={{
-            backgroundColor: look.shirt,
-            clipPath:
-              "polygon(25% 0, 42% 7%, 58% 7%, 75% 0, 100% 25%, 84% 43%, 75% 34%, 75% 100%, 25% 100%, 25% 34%, 16% 43%, 0 25%)",
-          }}
-        />
-        <div className="relative -mt-2 flex h-[50%] w-[62%] justify-center gap-1">
-          <div
-            className="h-full w-1/2 -rotate-2"
-            style={{
-              backgroundColor: look.trousers,
-              clipPath: "polygon(0 0, 100% 0, 90% 100%, 8% 100%)",
-            }}
-          />
-          <div
-            className="h-full w-1/2 rotate-2"
-            style={{
-              backgroundColor: look.trousers,
-              clipPath: "polygon(0 0, 100% 0, 92% 100%, 10% 100%)",
-            }}
-          />
-        </div>
-      </div>
-
-      <span className="handwritten absolute bottom-5 right-5 rotate-[-8deg] text-2xl text-ink">
-        {look.note}
-      </span>
-    </div>
-  );
-}
-
 export function EditorialSection() {
+  const { pieces } = useClothes();
+
+  const tops = pieces.filter((piece) => piece.category === "top");
+  const layers = pieces.filter(
+    (piece) => piece.category === "layer" || piece.category === "outerwear",
+  );
+  const bottoms = pieces.filter((piece) => piece.category === "bottom");
+
+  const looks = tops.slice(0, 3).map((top, index) => {
+  const lookPieces = [
+    top,
+    bottoms.length ? bottoms[index % bottoms.length] : undefined,
+    layers.length ? layers[index % layers.length] : undefined,
+  ].filter((piece): piece is (typeof pieces)[number] => piece !== undefined);
+
+  return {
+    number: String(index + 1).padStart(2, "0"),
+    title: ["The usual", "One more layer", "A different starting point"][index],
+    note: ["Monday, probably.", "A little colder.", "Later in the day."][index],
+    pieces: lookPieces,
+  };
+});
+
   return (
     <section className="py-24 md:py-32">
       <div className="lvry-container">
         <div className="mb-14 grid gap-8 md:grid-cols-[1fr_0.7fr] md:items-end">
           <div>
             <SectionLabel number="03">A FEW WAYS TO WEAR IT</SectionLabel>
+
             <h2 className="display-heading mt-7 text-5xl md:text-7xl">
               One uniform.
               <br />
@@ -529,6 +382,7 @@ export function EditorialSection() {
               You probably have a few clothes you reach for more than the
               others. We think that's worth building around.
             </p>
+
             <Link href="/lookbook" className="text-link mt-6">
               See the lookbook <Arrow diagonal />
             </Link>
@@ -536,29 +390,62 @@ export function EditorialSection() {
         </div>
 
         <div className="grid gap-5 md:grid-cols-3">
-          {editorialLooks.map((look) => (
+          {looks.map((look) => (
             <Link
               href="/lookbook"
               key={look.number}
               className="group block"
             >
-              <div className="relative overflow-hidden">
-                <EditorialIllustration look={look} />
+              <div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden bg-surface p-8">
+                <span className="absolute left-5 top-5 font-mono text-[10px] text-ink/60">
+                  LVRY / LOOK {look.number}
+                </span>
+
+                <div className="flex h-full w-full flex-col items-center justify-center">
+                  {look.pieces.map((piece, index) => (
+                    <div
+                      key={piece.id}
+                      className={`relative h-[38%] w-[80%] ${
+                        index === 0
+                          ? "z-30 -rotate-3"
+                          : index === 1
+                            ? "z-20 -mt-6 rotate-2"
+                            : "z-10 -mt-6 -rotate-2"
+                      }`}
+                    >
+                      <Image
+                        src={piece.image}
+                        alt={piece.name}
+                        fill
+                        sizes="(max-width: 767px) 100vw, 33vw"
+                        className="object-contain"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                <span className="handwritten absolute bottom-5 right-5 rotate-[-8deg] text-2xl text-ink">
+                  {look.note}
+                </span>
+
                 <div className="absolute inset-0 bg-ink/0 transition-colors duration-300 group-hover:bg-ink/5" />
               </div>
 
               <div className="mt-5 flex items-start justify-between gap-4">
                 <div>
-                  <span className="font-mono text-[10px] text-signal">
+                  <span className="font-mono text-[10px] text-denim">
                     {look.number} / THE LOOK
                   </span>
+
                   <h3 className="mt-2 font-display text-2xl tracking-tight">
                     {look.title}
                   </h3>
+
                   <p className="mt-2 max-w-xs text-xs leading-5 text-muted">
-                    {look.description}
+                    {look.pieces.map((piece) => piece.name).join(" / ")}
                   </p>
                 </div>
+
                 <span className="mt-6 transition-transform group-hover:translate-x-1">
                   <Arrow diagonal />
                 </span>
@@ -566,13 +453,19 @@ export function EditorialSection() {
             </Link>
           ))}
         </div>
+
+        {looks.length === 0 && (
+          <p className="py-12 text-sm text-muted">
+            Looks will appear here once the collection has enough pieces.
+          </p>
+        )}
       </div>
     </section>
   );
 }
 
 /* ─────────────────────────────────────────
-   05 — PHILOSOPHY
+   04 — PHILOSOPHY
    ───────────────────────────────────────── */
 
 const principles = [
@@ -589,7 +482,8 @@ const principles = [
   {
     number: "03",
     title: "Plain-spoken",
-    description: "Fit, fabric, measurements and care. The useful information comes first.",
+    description:
+      "Fit, fabric, measurements and care. The useful information comes first.",
   },
 ];
 
@@ -630,13 +524,15 @@ export function PhilosophySection() {
                 key={principle.number}
                 className="grid grid-cols-[45px_1fr] gap-4 border-b border-ink/20 py-7 md:grid-cols-[65px_1fr]"
               >
-                <span className="pt-2 font-mono text-[10px] text-signal">
+                <span className="pt-2 font-mono text-[10px] text-denim">
                   {principle.number}
                 </span>
+
                 <div>
                   <h3 className="font-display text-3xl tracking-tight md:text-4xl">
                     {principle.title}
                   </h3>
+
                   <p className="mt-3 max-w-sm text-sm leading-6 text-muted">
                     {principle.description}
                   </p>
@@ -646,11 +542,13 @@ export function PhilosophySection() {
 
             <div className="relative mt-8 rotate-2 border border-ink/15 bg-bone p-6 shadow-paper">
               <span className="eyebrow text-muted">THE SHORT VERSION</span>
+
               <p className="display-heading mt-4 text-3xl md:text-4xl">
                 A few pieces.
                 <br />
                 Your own combination.
               </p>
+
               <span className="handwritten absolute -bottom-5 right-5 -rotate-6 text-2xl text-denim">
                 That's the idea.
               </span>
@@ -663,7 +561,7 @@ export function PhilosophySection() {
 }
 
 /* ─────────────────────────────────────────
-   06 — NEWSLETTER
+   05 — NEWSLETTER
    ───────────────────────────────────────── */
 
 export function NewsletterSection() {
@@ -680,7 +578,7 @@ export function NewsletterSection() {
       return;
     }
 
-    // Demo only. Connect a mailing-list service before collecting real emails.
+    // Demo only. No subscription is created or stored.
     setSubmitted(true);
   }
 
@@ -709,12 +607,15 @@ export function NewsletterSection() {
           {submitted ? (
             <div className="border-t border-bone/30 py-6">
               <span className="eyebrow text-signal">FORM DEMONSTRATION</span>
+
               <h3 className="mt-4 font-display text-3xl">
                 You're on the list.
               </h3>
+
               <p className="mt-3 text-sm text-bone/65">
                 This is a demo. No subscription was created.
               </p>
+
               <button
                 type="button"
                 onClick={() => {

@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 
-import clothesData from "@/data/lvry-clothes.json";
+import clothesData from "@/public/data/lvry-clothes.json";
 
 // Types
 

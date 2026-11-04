@@ -7,18 +7,10 @@ import {
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
-  Plus,
   ShoppingBag,
   X,
 } from "lucide-react";
-
-type Piece = {
-  name: string;
-  category: string;
-  slug: string;
-  note: string;
-  number: string;
-};
+import { useClothes } from "@/contexts/clothes-context";
 
 type Look = {
   id: string;
@@ -27,12 +19,9 @@ type Look = {
   title: string;
   subtitle: string;
   description: string;
-  image: string;
-  imageAlt: string;
-  imagePosition: string;
-  background: string;
   annotation: string;
-  pieces: Piece[];
+  background: string;
+  pieceIds: string[];
 };
 
 const looks: Look[] = [
@@ -43,28 +32,13 @@ const looks: Look[] = [
     title: "The usual.",
     subtitle: "A good place to start.",
     description:
-      "A tee, straight trousers, and not much else. Some combinations don't need much explaining.",
-    image:
-      "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=1600&q=85",
-    imageAlt: "Everyday fashion editorial with a relaxed outfit",
-    imagePosition: "center 25%",
-    background: "#D9D0C2",
+      "A simple combination of a T-shirt and pleated chinos. Some combinations don't need much explaining.",
     annotation: "No decisions required.",
-    pieces: [
-      {
-        name: "Relaxed tee",
-        category: "01 / TOP",
-        slug: "relaxed-tee",
-        note: "The usual starting point.",
-        number: "01",
-      },
-      {
-        name: "Straight trousers",
-        category: "03 / BOTTOM",
-        slug: "straight-trousers",
-        note: "Goes with most things.",
-        number: "03",
-      },
+    background: "#D9D0C2",
+    pieceIds: [
+      "off-white-short-sleeve-tshirt",
+      "tan-pleated-chinos",
+      "canvas-tote-bag",
     ],
   },
   {
@@ -74,35 +48,13 @@ const looks: Look[] = [
     title: "One more layer.",
     subtitle: "For when a tee isn't enough.",
     description:
-      "The overshirt does most of the work here. Wear it open, leave it alone, get on with the day.",
-    image:
-      "https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=1600&q=85",
-    imageAlt: "Layered everyday outfit in neutral tones",
-    imagePosition: "center 25%",
-    background: "#B8C2C8",
+      "A T-shirt with an overshirt on top. Leave it open, keep the rest simple, get on with the day.",
     annotation: "An extra layer. That's all.",
-    pieces: [
-      {
-        name: "Relaxed tee",
-        category: "01 / TOP",
-        slug: "relaxed-tee",
-        note: "The base layer.",
-        number: "01",
-      },
-      {
-        name: "Overshirt",
-        category: "02 / LAYER",
-        slug: "overshirt",
-        note: "For when a tee isn't enough.",
-        number: "02",
-      },
-      {
-        name: "Straight trousers",
-        category: "03 / BOTTOM",
-        slug: "straight-trousers",
-        note: "Keeps things simple.",
-        number: "03",
-      },
+    background: "#B8C2C8",
+    pieceIds: [
+      "off-white-short-sleeve-tshirt",
+      "blue-button-down-overshirt",
+      "dark-blue-denim-jeans",
     ],
   },
   {
@@ -110,37 +62,15 @@ const looks: Look[] = [
     number: "03",
     day: "WEDNESDAY, OR SO",
     title: "Out the door.",
-    subtitle: "An extra layer. Nothing complicated.",
+    subtitle: "A little more structure.",
     description:
-      "A jacket over the usual combination. Useful when the weather has other plans.",
-    image:
-      "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1600&q=85",
-    imageAlt: "Street-style editorial outfit with outerwear",
-    imagePosition: "center 20%",
-    background: "#C5B8A5",
+      "A long-sleeve base with a zip-up jacket and denim. An uncomplicated combination with another layer.",
     annotation: "Weather dependent.",
-    pieces: [
-      {
-        name: "Relaxed tee",
-        category: "01 / TOP",
-        slug: "relaxed-tee",
-        note: "The usual starting point.",
-        number: "01",
-      },
-      {
-        name: "Everyday jacket",
-        category: "04 / OUTERWEAR",
-        slug: "everyday-jacket",
-        note: "An extra layer.",
-        number: "04",
-      },
-      {
-        name: "Straight trousers",
-        category: "03 / BOTTOM",
-        slug: "straight-trousers",
-        note: "Goes with most things.",
-        number: "03",
-      },
+    background: "#C5B8A5",
+    pieceIds: [
+      "olive-green-long-sleeve-tshirt",
+      "black-zip-up-jacket",
+      "dark-blue-denim-jeans",
     ],
   },
   {
@@ -150,35 +80,13 @@ const looks: Look[] = [
     title: "Back to basics.",
     subtitle: "Nothing new to figure out.",
     description:
-      "The pieces you already know. Put them together again. There's a reason you keep reaching for them.",
-    image:
-      "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=85",
-    imageAlt: "Carefully arranged everyday clothing in neutral colors",
-    imagePosition: "center",
-    background: "#E0D7C9",
+      "A sweatshirt, chinos and a tote. The pieces you already know, put together again.",
     annotation: "Made to repeat.",
-    pieces: [
-      {
-        name: "Relaxed tee",
-        category: "01 / TOP",
-        slug: "relaxed-tee",
-        note: "The usual starting point.",
-        number: "01",
-      },
-      {
-        name: "Overshirt",
-        category: "02 / LAYER",
-        slug: "overshirt",
-        note: "A familiar extra layer.",
-        number: "02",
-      },
-      {
-        name: "Straight trousers",
-        category: "03 / BOTTOM",
-        slug: "straight-trousers",
-        note: "Goes with most things.",
-        number: "03",
-      },
+    background: "#E0D7C9",
+    pieceIds: [
+      "beige-crewneck-sweatshirt",
+      "tan-pleated-chinos",
+      "canvas-tote-bag",
     ],
   },
 ];
@@ -186,43 +94,56 @@ const looks: Look[] = [
 const details = [
   {
     number: "A",
-    title: "The pieces",
-    description: "A small collection. Each piece has a place.",
-    image:
-      "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=900&q=80",
-    alt: "Clothing pieces arranged together",
+    pieceId: "olive-green-long-sleeve-tshirt",
+    title: "The starting point",
+    description: "A piece that can work on its own or underneath another.",
     className: "aspect-[4/5]",
   },
   {
     number: "B",
-    title: "The details",
-    description: "The things you notice after wearing something.",
-    image:
-      "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?auto=format&fit=crop&w=900&q=80",
-    alt: "Close-up of clothing and fabric details",
+    pieceId: "blue-button-down-overshirt",
+    title: "The extra layer",
+    description: "Another piece in the combination. Nothing complicated.",
     className: "aspect-[5/4]",
   },
   {
     number: "C",
+    pieceId: "tan-pleated-chinos",
     title: "The everyday",
-    description: "Not every day needs a different outfit.",
-    image:
-      "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80",
-    alt: "People wearing everyday outfits",
+    description: "A familiar part of the rotation.",
     className: "aspect-[4/5]",
   },
 ];
 
+const categoryLabels: Record<string, string> = {
+  top: "TOP",
+  layer: "LAYER",
+  bottom: "BOTTOM",
+  outerwear: "OUTERWEAR",
+  accessory: "ACCESSORY",
+};
+
 export default function LookbookPage() {
+  const { getPiece } = useClothes();
+
   const [activeLookIndex, setActiveLookIndex] = useState(0);
-  const [selectedPiece, setSelectedPiece] = useState<Piece | null>(null);
+  const [selectedPieceId, setSelectedPieceId] = useState<string | null>(null);
   const [shopPanelOpen, setShopPanelOpen] = useState(false);
 
   const activeLook = looks[activeLookIndex];
 
+  const activePieces = activeLook.pieceIds.flatMap((id) => {
+    const piece = getPiece(id);
+    return piece ? [piece] : [];
+  });
+
+  const selectedPiece = selectedPieceId
+    ? activePieces.find((piece) => piece.id === selectedPieceId) ?? null
+    : null;
+
   const changeLook = (index: number) => {
     setActiveLookIndex((index + looks.length) % looks.length);
-    setSelectedPiece(null);
+    setSelectedPieceId(null);
   };
 
   const nextLook = () => changeLook(activeLookIndex + 1);
@@ -236,11 +157,13 @@ export default function LookbookPage() {
     };
 
     document.addEventListener("keydown", handleKeyDown);
+
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
     };
   }, [shopPanelOpen]);
 
@@ -297,17 +220,16 @@ export default function LookbookPage() {
       </section>
 
       {/* EDITORIAL LOOK SELECTOR */}
-      <section
-        id="looks"
-        className="px-3 pb-20 sm:px-6 lg:px-10 lg:pb-28"
-      >
+      <section id="looks" className="px-3 pb-20 sm:px-6 lg:px-10 lg:pb-28">
         <div className="mx-auto max-w-[1600px]">
           <div className="mb-4 flex items-end justify-between px-2">
             <div>
               <p className="font-mono text-[10px] tracking-[0.16em] text-black/50">
                 THE LOOKS
               </p>
-              <p className="mt-1 text-sm">Four ways to wear the same pieces.</p>
+              <p className="mt-1 text-sm">
+                Four ways to wear the same collection.
+              </p>
             </div>
 
             <span className="font-mono text-[10px] tracking-[0.12em] text-black/50">
@@ -316,23 +238,12 @@ export default function LookbookPage() {
           </div>
 
           <div className="grid overflow-hidden border border-black/15 bg-[#E5DFD5] lg:grid-cols-[minmax(0,1.55fr)_minmax(320px,0.65fr)]">
-            {/* IMAGE COMPOSITION */}
+            {/* GARMENT COMPOSITION */}
             <div
-              className="relative min-h-[540px] overflow-hidden sm:min-h-[700px] lg:min-h-[790px]"
+              className="relative flex min-h-[540px] items-center justify-center overflow-hidden sm:min-h-[700px] lg:min-h-[790px]"
               style={{ backgroundColor: activeLook.background }}
             >
-              <img
-                key={activeLook.id}
-                src={activeLook.image}
-                alt={activeLook.imageAlt}
-                className="absolute inset-0 h-full w-full object-cover transition-opacity duration-500"
-                style={{ objectPosition: activeLook.imagePosition }}
-              />
-
-              <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-black/5" />
-
-              {/* IMAGE LABEL */}
-              <div className="absolute left-5 top-5 flex items-center gap-2 sm:left-8 sm:top-8">
+              <div className="absolute left-5 top-5 z-20 flex items-center gap-2 sm:left-8 sm:top-8">
                 <span className="bg-[#EFEBE4] px-3 py-2 font-mono text-[9px] tracking-[0.14em]">
                   LVRY / {activeLook.number}
                 </span>
@@ -341,15 +252,47 @@ export default function LookbookPage() {
                 </span>
               </div>
 
-              {/* ANNOTATION */}
-              <div className="absolute right-5 top-20 rotate-[7deg] sm:right-12 sm:top-24">
-                <span className="font-serif text-lg italic text-white drop-shadow-md sm:text-2xl">
+              {/* Decorative background marks */}
+              <div className="pointer-events-none absolute inset-0 opacity-20">
+                <div className="absolute left-[12%] top-[18%] h-40 w-40 rounded-full border border-black/40" />
+                <div className="absolute bottom-[18%] right-[12%] h-64 w-64 rounded-full border border-black/30" />
+                <div className="absolute left-1/2 top-0 h-full w-px bg-black/10" />
+              </div>
+
+              {/* Actual catalog pieces */}
+              <div className="relative z-10 grid w-full max-w-[850px] grid-cols-2 items-center gap-3 px-5 pb-32 pt-24 sm:gap-8 sm:px-12">
+                {activePieces.map((piece, index) => (
+                  <Link
+                    key={piece.id}
+                    href={`/shop/${piece.id}`}
+                    className={`group relative flex aspect-[4/5] items-center justify-center transition-transform duration-500 hover:-translate-y-2 ${
+                      index === 1 ? "translate-y-10" : ""
+                    } ${activePieces.length === 3 && index === 2 ? "col-span-2 mx-auto w-[65%] sm:w-[55%]" : ""}`}
+                    aria-label={`View ${piece.name}`}
+                  >
+                    <img
+                      src={piece.image}
+                      alt={piece.name}
+                      className="h-full w-full object-contain drop-shadow-[0_18px_14px_rgba(0,0,0,0.12)] transition-transform duration-500 group-hover:scale-[1.04]"
+                    />
+
+                    <span className="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap bg-[#EFEBE4] px-3 py-1.5 font-mono text-[8px] tracking-[0.12em] opacity-0 transition-opacity group-hover:opacity-100">
+                      VIEW PIECE
+                    </span>
+                  </Link>
+                ))}
+              </div>
+
+              {/* Annotation */}
+              <div className="absolute right-5 top-20 z-20 rotate-[7deg] sm:right-12 sm:top-24">
+                <span className="font-serif text-lg italic text-[#111111] sm:text-2xl">
                   {activeLook.annotation}
                 </span>
                 <svg
                   viewBox="0 0 90 25"
-                  className="ml-3 h-5 w-20 text-white"
+                  className="ml-3 h-5 w-20 text-[#111111]"
                   fill="none"
+                  aria-hidden="true"
                 >
                   <path
                     d="M2 3C25 22 59 23 83 8M73 5L84 8L78 18"
@@ -361,7 +304,7 @@ export default function LookbookPage() {
               </div>
 
               {/* IMAGE FOOTER */}
-              <div className="absolute bottom-0 left-0 right-0 flex items-end justify-between p-5 text-white sm:p-8">
+              <div className="absolute bottom-0 left-0 right-0 z-20 flex items-end justify-between bg-gradient-to-t from-black/30 to-transparent p-5 text-white sm:p-8">
                 <div>
                   <p className="mb-2 font-mono text-[9px] tracking-[0.2em] text-white/75">
                     CURRENT STUDY
@@ -401,7 +344,7 @@ export default function LookbookPage() {
                     THE COMBINATION
                   </span>
                   <span className="font-mono text-[10px] text-black/50">
-                    {activeLook.pieces.length} PIECES
+                    {activePieces.length} PIECES
                   </span>
                 </div>
 
@@ -410,26 +353,27 @@ export default function LookbookPage() {
                 </p>
 
                 <div className="mb-8 mt-10 border-t border-black/15">
-                  {activeLook.pieces.map((piece, index) => (
+                  {activePieces.map((piece, index) => (
                     <button
-                      key={piece.slug}
-                      onClick={() => setSelectedPiece(piece)}
+                      key={piece.id}
+                      onClick={() => setSelectedPieceId(piece.id)}
+                      aria-pressed={selectedPieceId === piece.id}
                       className={`group flex w-full items-center justify-between border-b border-black/15 py-5 text-left transition-colors ${
-                        selectedPiece?.slug === piece.slug
+                        selectedPieceId === piece.id
                           ? "bg-black/[0.035]"
                           : "hover:bg-black/[0.025]"
                       }`}
                     >
                       <div className="flex items-center gap-4">
                         <span className="font-mono text-[10px] text-black/35">
-                          {piece.number}
+                          0{index + 1}
                         </span>
                         <div>
                           <p className="text-[15px] tracking-[-0.02em]">
                             {piece.name}
                           </p>
                           <p className="mt-1 font-mono text-[9px] tracking-[0.12em] text-black/45">
-                            {piece.category}
+                            {categoryLabels[piece.category] ?? piece.category}
                           </p>
                         </div>
                       </div>
@@ -446,12 +390,12 @@ export default function LookbookPage() {
                     <p className="font-mono text-[9px] tracking-[0.15em] text-black/45">
                       SELECTED PIECE
                     </p>
-                    <p className="mt-2 text-sm">{selectedPiece.note}</p>
+                    <p className="mt-2 text-sm">{selectedPiece.name}</p>
                     <Link
-                      href={`/shop/${selectedPiece.slug}`}
+                      href={`/shop/${selectedPiece.id}`}
                       className="mt-3 inline-flex items-center gap-2 text-xs underline underline-offset-4"
                     >
-                      View {selectedPiece.name.toLowerCase()}
+                      View this piece
                       <ArrowUpRight size={13} />
                     </Link>
                   </div>
@@ -476,7 +420,7 @@ export default function LookbookPage() {
                 </button>
               </div>
 
-              {/* SELECTOR */}
+              {/* LOOK SELECTOR */}
               <div className="border-t border-black/15 p-6 sm:p-8 lg:p-9">
                 <div className="mb-4 flex items-center justify-between">
                   <span className="font-mono text-[9px] tracking-[0.15em] text-black/50">
@@ -488,29 +432,34 @@ export default function LookbookPage() {
                 </div>
 
                 <div className="grid grid-cols-4 gap-2">
-                  {looks.map((look, index) => (
-                    <button
-                      key={look.id}
-                      onClick={() => changeLook(index)}
-                      aria-label={`Show look ${look.number}: ${look.title}`}
-                      aria-pressed={activeLookIndex === index}
-                      className={`group relative aspect-square overflow-hidden border transition-all ${
-                        activeLookIndex === index
-                          ? "border-black p-1"
-                          : "border-transparent opacity-55 hover:opacity-100"
-                      }`}
-                    >
-                      <img
-                        src={look.image}
-                        alt=""
-                        className="h-full w-full object-cover"
-                        style={{ objectPosition: look.imagePosition }}
-                      />
-                      <span className="absolute bottom-1 right-1 bg-[#EFEBE4] px-1.5 py-1 font-mono text-[8px] text-black">
-                        {look.number}
-                      </span>
-                    </button>
-                  ))}
+                  {looks.map((look, index) => {
+                    const previewPiece = getPiece(look.pieceIds[0]);
+
+                    return (
+                      <button
+                        key={look.id}
+                        onClick={() => changeLook(index)}
+                        aria-label={`Show look ${look.number}: ${look.title}`}
+                        aria-pressed={activeLookIndex === index}
+                        className={`group relative aspect-square overflow-hidden border transition-all ${
+                          activeLookIndex === index
+                            ? "border-black bg-[#E5DFD5] p-1"
+                            : "border-transparent bg-[#E5DFD5] opacity-55 hover:opacity-100"
+                        }`}
+                      >
+                        {previewPiece && (
+                          <img
+                            src={previewPiece.image}
+                            alt=""
+                            className="h-full w-full object-contain"
+                          />
+                        )}
+                        <span className="absolute bottom-1 right-1 bg-[#EFEBE4] px-1.5 py-1 font-mono text-[8px] text-black">
+                          {look.number}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
 
                 <div className="mt-5 flex items-center justify-between">
@@ -604,41 +553,59 @@ export default function LookbookPage() {
           </div>
 
           <div className="grid gap-5 md:grid-cols-3">
-            {details.map((detail, index) => (
-              <article
-                key={detail.number}
-                className={index === 1 ? "md:mt-16" : ""}
-              >
-                <div
-                  className={`relative overflow-hidden bg-[#DDD5C9] ${detail.className}`}
+            {details.map((detail, index) => {
+              const piece = getPiece(detail.pieceId);
+
+              if (!piece) return null;
+
+              return (
+                <article
+                  key={detail.number}
+                  className={index === 1 ? "md:mt-16" : ""}
                 >
-                  <img
-                    src={detail.image}
-                    alt={detail.alt}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-700 hover:scale-[1.035]"
-                  />
+                  <Link
+                    href={`/shop/${piece.id}`}
+                    className="group block"
+                  >
+                    <div
+                      className={`relative flex items-center justify-center overflow-hidden bg-[#DDD5C9] p-8 ${detail.className}`}
+                    >
+                      <img
+                        src={piece.image}
+                        alt={piece.name}
+                        loading="lazy"
+                        className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-[1.045]"
+                      />
 
-                  <span className="absolute left-4 top-4 bg-[#EFEBE4] px-2.5 py-1.5 font-mono text-[9px] tracking-[0.12em]">
-                    DETAIL / {detail.number}
-                  </span>
-                </div>
+                      <span className="absolute left-4 top-4 bg-[#EFEBE4] px-2.5 py-1.5 font-mono text-[9px] tracking-[0.12em]">
+                        DETAIL / {detail.number}
+                      </span>
 
-                <div className="flex items-start justify-between gap-4 border-b border-black/20 py-5">
-                  <div>
-                    <h3 className="text-xl tracking-[-0.04em]">
-                      {detail.title}
-                    </h3>
-                    <p className="mt-1 text-xs text-black/50">
-                      {detail.description}
-                    </p>
-                  </div>
-                  <span className="font-mono text-[10px] text-black/40">
-                    0{index + 1}
-                  </span>
-                </div>
-              </article>
-            ))}
+                      <span className="absolute bottom-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#EFEBE4] opacity-0 transition-all group-hover:opacity-100">
+                        <ArrowUpRight size={16} />
+                      </span>
+                    </div>
+
+                    <div className="flex items-start justify-between gap-4 border-b border-black/20 py-5">
+                      <div>
+                        <h3 className="text-xl tracking-[-0.04em]">
+                          {detail.title}
+                        </h3>
+                        <p className="mt-1 text-xs text-black/50">
+                          {detail.description}
+                        </p>
+                        <p className="mt-3 font-mono text-[9px] tracking-[0.12em] text-black/45">
+                          {piece.name.toUpperCase()}
+                        </p>
+                      </div>
+                      <span className="font-mono text-[10px] text-black/40">
+                        0{index + 1}
+                      </span>
+                    </div>
+                  </Link>
+                </article>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -653,9 +620,7 @@ export default function LookbookPage() {
           <h2 className="max-w-[1100px] text-[clamp(4rem,12vw,11rem)] font-medium leading-[0.82] tracking-[-0.095em]">
             Wear it.
             <br />
-            <span className="font-serif font-normal italic">
-              Repeat.
-            </span>
+            <span className="font-serif font-normal italic">Repeat.</span>
           </h2>
 
           <div className="mt-14 flex flex-col justify-between gap-10 border-t border-white/20 pt-6 sm:flex-row sm:items-end">
@@ -724,15 +689,18 @@ export default function LookbookPage() {
 
             <div className="flex-1 overflow-y-auto px-6 py-6">
               <div
-                className="relative mb-8 aspect-[5/4] overflow-hidden"
+                className="relative mb-8 grid aspect-[5/4] grid-cols-2 items-center gap-2 overflow-hidden p-5"
                 style={{ backgroundColor: activeLook.background }}
               >
-                <img
-                  src={activeLook.image}
-                  alt={activeLook.imageAlt}
-                  className="h-full w-full object-cover"
-                  style={{ objectPosition: activeLook.imagePosition }}
-                />
+                {activePieces.map((piece) => (
+                  <img
+                    key={piece.id}
+                    src={piece.image}
+                    alt={piece.name}
+                    className="h-full w-full object-contain"
+                  />
+                ))}
+
                 <span className="absolute bottom-3 left-3 bg-[#EFEBE4] px-3 py-2 font-mono text-[9px] tracking-[0.12em]">
                   LOOK {activeLook.number} / {activeLook.day}
                 </span>
@@ -744,7 +712,7 @@ export default function LookbookPage() {
                     {activeLook.title}
                   </h3>
                   <p className="mt-1 text-xs text-black/50">
-                    {activeLook.pieces.length} pieces in this combination
+                    {activePieces.length} pieces in this combination
                   </p>
                 </div>
                 <span className="font-mono text-[10px] text-black/40">
@@ -753,23 +721,20 @@ export default function LookbookPage() {
               </div>
 
               <div className="border-t border-black/15">
-                {activeLook.pieces.map((piece) => (
+                {activePieces.map((piece) => (
                   <div
-                    key={piece.slug}
+                    key={piece.id}
                     className="flex items-center justify-between gap-4 border-b border-black/15 py-5"
                   >
                     <div>
                       <p className="font-mono text-[9px] tracking-[0.12em] text-black/40">
-                        {piece.category}
+                        {categoryLabels[piece.category] ?? piece.category}
                       </p>
                       <p className="mt-1 text-[15px]">{piece.name}</p>
-                      <p className="mt-1 text-xs text-black/50">
-                        {piece.note}
-                      </p>
                     </div>
 
                     <Link
-                      href={`/shop/${piece.slug}`}
+                      href={`/shop/${piece.id}`}
                       onClick={() => setShopPanelOpen(false)}
                       className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-black/20 transition-colors hover:bg-black hover:text-white"
                       aria-label={`View ${piece.name}`}

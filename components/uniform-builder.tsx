@@ -1,6 +1,8 @@
 
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import {
   useCallback,
   useEffect,
@@ -10,52 +12,39 @@ import {
 } from "react";
 import {
   ArrowDown,
-  ArrowLeft,
   ArrowRight,
   Check,
-  ChevronDown,
   Copy,
   Layers,
-  Minus,
   Plus,
   Redo2,
   RotateCcw,
   Save,
   Share2,
-  ShoppingBag,
-  Sparkles,
+  Shuffle,
   Trash2,
   Undo2,
   X,
 } from "lucide-react";
+import { useClothes } from "@/contexts/clothes-context";
 import { useBag } from "@/contexts/bag-context";
 
 // --------------------------------------------------
 // TYPES
 // --------------------------------------------------
 
-type Slot = "top" | "layer" | "bottom" | "outerwear";
-type Background = "bone" | "kraft" | "denim" | "canvas";
+type Piece = ReturnType<typeof useClothes>["pieces"][number];
+
+type Slot = Piece["category"];
+
 type Category = Slot | "all";
 
-type Product = {
-  id: string;
-  number: string;
-  name: string;
-  description: string;
-  category: string;
-  color: string;
-  colorHex: string;
-  sizes: string[];
-  slug: string;
-  slot: Slot;
-};
+type Background = "bone" | "kraft" | "denim" | "canvas";
 
 type OutfitSlots = Record<Slot, string | null>;
 
 type OutfitState = {
   slots: OutfitSlots;
-  sizes: Record<string, string>;
   background: Background;
 };
 
@@ -72,85 +61,13 @@ type HistoryState = {
 
 const STORAGE_KEY = "lvry-saved-outfits";
 
-const emptySlots: OutfitSlots = {
-  top: null,
-  layer: null,
-  bottom: null,
-  outerwear: null,
-};
-
-const initialState: OutfitState = {
-  slots: {
-    top: "relaxed-tee",
-    layer: null,
-    bottom: "straight-trousers",
-    outerwear: null,
-  },
-  sizes: {},
-  background: "bone",
-};
-
-// --------------------------------------------------
-// PRODUCT DATA
-// --------------------------------------------------
-
-const products: Product[] = [
-  {
-    id: "relaxed-tee",
-    number: "001",
-    name: "Relaxed tee",
-    description: "The usual starting point.",
-    category: "Tops",
-    color: "Bone",
-    colorHex: "#EFEBE4",
-    sizes: ["S", "M", "L", "XL"],
-    slug: "relaxed-tee",
-    slot: "top",
-  },
-  {
-    id: "overshirt",
-    number: "002",
-    name: "Overshirt",
-    description: "For when a tee isn't enough.",
-    category: "Layers",
-    color: "Denim",
-    colorHex: "#3E5C8A",
-    sizes: ["S", "M", "L", "XL"],
-    slug: "overshirt",
-    slot: "layer",
-  },
-  {
-    id: "straight-trousers",
-    number: "003",
-    name: "Straight trousers",
-    description: "Goes with most things.",
-    category: "Bottoms",
-    color: "Canvas",
-    colorHex: "#C9B79C",
-    sizes: ["S", "M", "L"],
-    slug: "straight-trousers",
-    slot: "bottom",
-  },
-  {
-    id: "everyday-jacket",
-    number: "004",
-    name: "Everyday jacket",
-    description: "An extra layer. Nothing complicated.",
-    category: "Outerwear",
-    color: "Ink",
-    colorHex: "#252525",
-    sizes: ["M", "L", "XL"],
-    slug: "everyday-jacket",
-    slot: "outerwear",
-  },
-];
-
 const categories: { id: Category; label: string }[] = [
   { id: "all", label: "Everything" },
   { id: "top", label: "Tops" },
   { id: "layer", label: "Layers" },
   { id: "bottom", label: "Bottoms" },
   { id: "outerwear", label: "Outerwear" },
+  { id: "accessory", label: "Accessories" },
 ];
 
 const slotLabels: Record<Slot, string> = {
@@ -158,6 +75,20 @@ const slotLabels: Record<Slot, string> = {
   layer: "Layer",
   bottom: "Bottom",
   outerwear: "Outerwear",
+  accessory: "Accessory",
+};
+
+const emptySlots: OutfitSlots = {
+  top: null,
+  layer: null,
+  bottom: null,
+  outerwear: null,
+  accessory: null,
+};
+
+const initialState: OutfitState = {
+  slots: { ...emptySlots },
+  background: "bone",
 };
 
 const backgrounds: {
@@ -166,158 +97,57 @@ const backgrounds: {
   color: string;
   textColor: string;
 }[] = [
-  { id: "bone", label: "Bone paper", color: "#EFEBE4", textColor: "#171613" },
-  { id: "kraft", label: "Kraft paper", color: "#C9B79C", textColor: "#171613" },
-  { id: "denim", label: "Denim", color: "#3E5C8A", textColor: "#EFEBE4" },
-  { id: "canvas", label: "Canvas", color: "#D8CBB8", textColor: "#171613" },
+  {
+    id: "bone",
+    label: "Bone paper",
+    color: "#EFEBE4",
+    textColor: "#171613",
+  },
+  {
+    id: "kraft",
+    label: "Kraft paper",
+    color: "#C9B79C",
+    textColor: "#171613",
+  },
+  {
+    id: "denim",
+    label: "Denim",
+    color: "#3E5C8A",
+    textColor: "#EFEBE4",
+  },
+  {
+    id: "canvas",
+    label: "Canvas",
+    color: "#D8CBB8",
+    textColor: "#171613",
+  },
 ];
 
 const slotPositions: Record<Slot, string> = {
-  top: "left-[30%] top-[7%] z-20 w-[40%]",
-  layer: "left-[40%] top-[11%] z-30 w-[43%]",
-  bottom: "left-[30%] bottom-[5%] z-10 w-[40%]",
-  outerwear: "left-[12%] top-[8%] z-40 w-[43%]",
+  top: "left-[28%] top-[8%] z-20 w-[42%]",
+  layer: "left-[39%] top-[12%] z-30 w-[43%]",
+  bottom: "left-[29%] bottom-[7%] z-10 w-[42%]",
+  outerwear: "left-[8%] top-[10%] z-40 w-[45%]",
+  accessory: "right-[5%] bottom-[22%] z-50 w-[24%]",
 };
 
-function getProduct(id: string | null): Product | undefined {
-  return products.find((product) => product.id === id);
+function getCategoryLabel(category: string) {
+  return slotLabels[category as Slot] ?? category;
 }
 
-// --------------------------------------------------
-// GARMENT ARTWORK
-// --------------------------------------------------
+function encodeOutfit(outfit: OutfitState) {
+  return btoa(
+    encodeURIComponent(
+      JSON.stringify(outfit),
+    ),
+  );
+}
 
-function GarmentArtwork({
-  product,
-  className = "",
-}: {
-  product: Product;
-  className?: string;
-}) {
-  const fill = product.colorHex;
-  const stroke = product.color === "Bone" ? "#B9B1A5" : "#171613";
-
-  return (
-    <svg
-      viewBox="0 0 300 360"
-      fill="none"
-      className={className}
-      role="img"
-      aria-label={product.name}
-    >
-      {product.id === "relaxed-tee" && (
-        <>
-          <path
-            d="M93 45 124 31c8 13 16 19 26 19s18-6 26-19l31 14 48 43-31 38-25-19v205H101V107l-25 19-31-38 48-43Z"
-            fill={fill}
-            stroke={stroke}
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M124 31c4 18 13 27 26 27s22-9 26-27"
-            stroke={stroke}
-            strokeWidth="2.5"
-          />
-          <path
-            d="M125 32c5 12 13 18 25 18s20-6 25-18"
-            stroke={stroke}
-            strokeWidth="1.5"
-            opacity=".35"
-          />
-        </>
-      )}
-
-      {product.id === "overshirt" && (
-        <>
-          <path
-            d="M91 43 124 31c7 13 16 20 26 20s19-7 26-20l33 12 44 45-29 39-23-18v210H99V109l-23 18-29-39 44-45Z"
-            fill={fill}
-            stroke={stroke}
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-          />
-          <path
-            d="m124 31 26 39 26-39M150 70v249"
-            stroke={stroke}
-            strokeWidth="2"
-          />
-          <path
-            d="m124 31 8 49-21-13-14 36M176 31l-8 49 21-13 14 36"
-            stroke={stroke}
-            strokeWidth="2"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M111 205h25v28h-25zM164 205h25v28h-25z"
-            stroke={stroke}
-            strokeWidth="1.5"
-          />
-          {[105, 135, 165, 195, 225, 255].map((y) => (
-            <circle key={y} cx="150" cy={y} r="2.5" fill={stroke} />
-          ))}
-        </>
-      )}
-
-      {product.id === "straight-trousers" && (
-        <>
-          <path
-            d="M83 36h134l-13 286h-53l-10-181-10 181H78L83 36Z"
-            fill={fill}
-            stroke={stroke}
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M83 36h134v35H83z"
-            fill={fill}
-            stroke={stroke}
-            strokeWidth="2"
-          />
-          <path
-            d="M150 72v69M92 85h116"
-            stroke={stroke}
-            strokeWidth="1.5"
-            opacity=".55"
-          />
-          <path
-            d="M135 36v16M165 36v16"
-            stroke={stroke}
-            strokeWidth="1.5"
-          />
-        </>
-      )}
-
-      {product.id === "everyday-jacket" && (
-        <>
-          <path
-            d="M91 43 124 31c7 13 16 20 26 20s19-7 26-20l33 12 44 45-29 39-23-18v210H99V109l-23 18-29-39 44-45Z"
-            fill={fill}
-            stroke={stroke}
-            strokeWidth="2.5"
-            strokeLinejoin="round"
-          />
-          <path
-            d="m124 31 26 39 26-39M150 70v249"
-            stroke="#EFEBE4"
-            strokeWidth="2"
-          />
-          <path
-            d="M124 31 110 86l40-16 40 16-14-55"
-            stroke="#EFEBE4"
-            strokeWidth="1.5"
-          />
-          <path
-            d="M105 236h34v33h-34zM161 236h34v33h-34z"
-            stroke="#EFEBE4"
-            strokeWidth="1.5"
-          />
-          {[110, 145, 180, 215, 250].map((y) => (
-            <circle key={y} cx="150" cy={y} r="2.5" fill="#EFEBE4" />
-          ))}
-        </>
-      )}
-    </svg>
+function decodeOutfit(value: string): unknown {
+  return JSON.parse(
+    decodeURIComponent(
+      atob(value),
+    ),
   );
 }
 
@@ -326,12 +156,12 @@ function GarmentArtwork({
 // --------------------------------------------------
 
 function ProductCard({
-  product,
+  piece,
   isSelected,
   onSelect,
   onDragStart,
 }: {
-  product: Product;
+  piece: Piece;
   isSelected: boolean;
   onSelect: () => void;
   onDragStart: (event: DragEvent<HTMLButtonElement>) => void;
@@ -344,23 +174,29 @@ function ProductCard({
       onClick={onSelect}
       aria-pressed={isSelected}
       className={`group min-w-0 text-left transition ${
-        isSelected ? "opacity-100" : "opacity-90 hover:opacity-100"
+        isSelected
+          ? "opacity-100"
+          : "opacity-90 hover:opacity-100"
       }`}
     >
       <div
-        className={`relative flex aspect-[4/4.7] items-center justify-center overflow-hidden border p-4 transition-all duration-300 ${
+        className={`relative aspect-[4/4.7] overflow-hidden border p-3 transition-all duration-300 ${
           isSelected
             ? "border-ink bg-[#EAE5DC]"
             : "border-transparent bg-[#F2EFEA] hover:border-ink/40"
         }`}
       >
-        <GarmentArtwork
-          product={product}
-          className="h-full w-full max-w-[130px] transition-transform duration-500 group-hover:scale-[1.06]"
+        <Image
+          src={piece.image}
+          alt={piece.name}
+          fill
+          sizes="(max-width: 640px) 45vw, 240px"
+          className="object-contain p-3 transition-transform duration-500 group-hover:scale-[1.05]"
+          draggable={false}
         />
 
         <span className="absolute left-3 top-3 font-mono text-[9px] text-muted">
-          {product.number}
+          {piece.collection}
         </span>
 
         {isSelected ? (
@@ -376,14 +212,15 @@ function ProductCard({
 
       <div className="mt-3 flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-xs font-medium">{product.name}</p>
+          <p className="text-xs font-medium">{piece.name}</p>
+
           <p className="mt-1 font-mono text-[10px] text-muted">
-            {product.color}
+            {getCategoryLabel(piece.category)}
           </p>
         </div>
 
         {isSelected && (
-          <span className="mt-0.5 font-mono text-[9px] text-muted">
+          <span className="mt-0.5 shrink-0 font-mono text-[9px] text-muted">
             ADDED
           </span>
         )}
@@ -397,7 +234,12 @@ function ProductCard({
 // --------------------------------------------------
 
 export function UniformBuilder() {
-  const { addItem } = useBag();
+  const {
+    pieces,
+    collections,
+  } = useClothes();
+
+  const {addItem} = useBag()
 
   const [outfit, setOutfit] = useState<OutfitState>(initialState);
 
@@ -406,16 +248,55 @@ export function UniformBuilder() {
     future: [],
   });
 
-  const [activeCategory, setActiveCategory] = useState<Category>("all");
-  const [selectedSlot, setSelectedSlot] = useState<Slot>("top");
-  const [savedOutfits, setSavedOutfits] = useState<SavedOutfit[]>([]);
+  const [activeCategory, setActiveCategory] =
+    useState<Category>("all");
+
+  const [selectedSlot, setSelectedSlot] =
+    useState<Slot>("top");
+
+  const [savedOutfits, setSavedOutfits] =
+    useState<SavedOutfit[]>([]);
 
   const [ready, setReady] = useState(false);
   const [message, setMessage] = useState("");
+
   const [saveDialog, setSaveDialog] = useState(false);
   const [outfitName, setOutfitName] = useState("");
+
   const [showSaved, setShowSaved] = useState(false);
   const [showReview, setShowReview] = useState(false);
+
+  // ------------------------------------------------
+  // CATALOG LOOKUPS
+  // ------------------------------------------------
+
+  const piecesById = useMemo(
+    () => new Map(pieces.map((piece) => [piece.id, piece])),
+    [pieces],
+  );
+
+  const collectionsByCodename = useMemo(
+    () =>
+      new Map(
+        collections.map((collection) => [
+          collection.codename,
+          collection,
+        ]),
+      ),
+    [collections],
+  );
+
+  function getPiece(id: string | null): Piece | undefined {
+    if (!id) return undefined;
+    return piecesById.get(id);
+  }
+
+  function getCollectionName(codename: string) {
+    return (
+      collectionsByCodename.get(codename)?.name ??
+      codename
+    );
+  }
 
   // ------------------------------------------------
   // DERIVED STATE
@@ -425,36 +306,35 @@ export function UniformBuilder() {
     () =>
       (Object.entries(outfit.slots) as [Slot, string | null][])
         .map(([slot, id]) => {
-          const product = getProduct(id);
-          return product ? { slot, product } : null;
+          const piece = id ? piecesById.get(id) : undefined;
+
+          return piece ? { slot, piece } : null;
         })
         .filter(
           (
             item,
           ): item is {
             slot: Slot;
-            product: Product;
+            piece: Piece;
           } => item !== null,
         ),
-    [outfit.slots],
+    [outfit.slots, piecesById],
   );
 
   const visibleProducts = useMemo(
     () =>
-      products.filter(
-        (product) =>
-          activeCategory === "all" || product.slot === activeCategory,
+      pieces.filter(
+        (piece) =>
+          activeCategory === "all" ||
+          piece.category === activeCategory,
       ),
-    [activeCategory],
+    [pieces, activeCategory],
   );
 
   const selectedBackground =
-    backgrounds.find((item) => item.id === outfit.background) ??
-    backgrounds[0];
-
-  const missingSizes = selectedProducts.filter(
-    ({ product }) => !outfit.sizes[product.id],
-  );
+    backgrounds.find(
+      (item) => item.id === outfit.background,
+    ) ?? backgrounds[0];
 
   const canUndo = history.past.length > 0;
   const canRedo = history.future.length > 0;
@@ -467,6 +347,10 @@ export function UniformBuilder() {
     (updater: (current: OutfitState) => OutfitState) => {
       setOutfit((current) => {
         const next = updater(current);
+
+        if (JSON.stringify(current) === JSON.stringify(next)) {
+          return current;
+        }
 
         setHistory((previous) => ({
           past: [...previous.past, current].slice(-30),
@@ -490,6 +374,7 @@ export function UniformBuilder() {
     }));
 
     setOutfit(previous);
+    setMessage("");
   }
 
   function redo() {
@@ -503,6 +388,87 @@ export function UniformBuilder() {
     }));
 
     setOutfit(next);
+    setMessage("");
+  }
+
+  // ------------------------------------------------
+  // VALIDATION
+  // ------------------------------------------------
+
+  function validateOutfit(value: unknown): OutfitState | null {
+    if (!value || typeof value !== "object") {
+      return null;
+    }
+
+    const data = value as {
+      slots?: Record<string, unknown>;
+      background?: unknown;
+    };
+
+    const validSlots: OutfitSlots = { ...emptySlots };
+
+    for (const slot of Object.keys(slotLabels) as Slot[]) {
+      const id = data.slots?.[slot];
+
+      if (typeof id !== "string") continue;
+
+      const piece = piecesById.get(id);
+
+      if (piece && piece.category === slot) {
+        validSlots[slot] = id;
+      }
+    }
+
+    const validBackground = backgrounds.some(
+      (item) => item.id === data.background,
+    )
+      ? (data.background as Background)
+      : "bone";
+
+    return {
+      slots: validSlots,
+      background: validBackground,
+    };
+  }
+
+  function validateSavedOutfits(value: unknown): SavedOutfit[] {
+    if (!Array.isArray(value)) return [];
+
+    return value
+      .map((item): SavedOutfit | null => {
+        if (!item || typeof item !== "object") return null;
+
+        const data = item as {
+          id?: unknown;
+          name?: unknown;
+          createdAt?: unknown;
+          slots?: Record<string, unknown>;
+          background?: unknown;
+        };
+
+        const validated = validateOutfit(data);
+
+        if (
+          !validated ||
+          typeof data.id !== "string" ||
+          typeof data.name !== "string"
+        ) {
+          return null;
+        }
+
+        return {
+          ...validated,
+          id: data.id,
+          name: data.name,
+          createdAt:
+            typeof data.createdAt === "number"
+              ? data.createdAt
+              : Date.now(),
+        };
+      })
+      .filter(
+        (item): item is SavedOutfit => item !== null,
+      );
   }
 
   // ------------------------------------------------
@@ -510,86 +476,64 @@ export function UniformBuilder() {
   // ------------------------------------------------
 
   useEffect(() => {
+    if (pieces.length === 0) return;
+
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
 
       if (saved) {
-        const parsed = JSON.parse(saved);
-
-        if (Array.isArray(parsed)) {
-          setSavedOutfits(parsed);
-        }
+        setSavedOutfits(
+          validateSavedOutfits(JSON.parse(saved)),
+        );
       }
 
-      const params = new URLSearchParams(window.location.search);
+      const params = new URLSearchParams(
+        window.location.search,
+      );
+
       const shared = params.get("outfit");
 
       if (shared) {
-        const decoded = JSON.parse(atob(shared));
+        const decoded = decodeOutfit(shared);
+        const validated = validateOutfit(decoded);
 
-        if (decoded && typeof decoded === "object") {
-          const validSlots: OutfitSlots = { ...emptySlots };
-
-          for (const slot of Object.keys(slotLabels) as Slot[]) {
-            const id = decoded.slots?.[slot];
-            if (products.some((product) => product.id === id)) {
-              validSlots[slot] = id;
-            }
-          }
-
-          const validBackground = backgrounds.some(
-            (item) => item.id === decoded.background,
-          )
-            ? decoded.background
-            : "bone";
-
-          const validSizes: Record<string, string> = {};
-
-          for (const product of products) {
-            const size = decoded.sizes?.[product.id];
-
-            if (product.sizes.includes(size)) {
-              validSizes[product.id] = size;
-            }
-          }
-
-          setOutfit({
-            slots: validSlots,
-            background: validBackground,
-            sizes: validSizes,
-          });
-
+        if (validated) {
+          setOutfit(validated);
           setMessage("Shared outfit loaded.");
         }
       }
     } catch {
-      // Ignore invalid local or shared data.
+      setMessage("Couldn't load the saved outfit.");
     } finally {
       setReady(true);
     }
-  }, []);
+    // Catalog is loaded by the context. Initialize once it exists.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pieces.length]);
 
   // ------------------------------------------------
   // ACTIONS
   // ------------------------------------------------
 
-  function selectProduct(product: Product) {
+  function selectPiece(piece: Piece) {
+    const slot = piece.category as Slot;
+
     updateOutfit((current) => ({
       ...current,
       slots: {
         ...current.slots,
-        [product.slot]:
-          current.slots[product.slot] === product.id
+        [slot]:
+          current.slots[slot] === piece.id
             ? null
-            : product.id,
+            : piece.id,
       },
     }));
 
-    setSelectedSlot(product.slot);
+    setSelectedSlot(slot);
     setMessage("");
   }
 
-  function removeProduct(slot: Slot) {
+  function removePiece(slot: Slot) {
     updateOutfit((current) => ({
       ...current,
       slots: {
@@ -603,30 +547,32 @@ export function UniformBuilder() {
 
   function handleDragStart(
     event: DragEvent<HTMLButtonElement>,
-    product: Product,
+    piece: Piece,
   ) {
-    event.dataTransfer.setData("text/plain", product.id);
+    event.dataTransfer.setData("text/plain", piece.id);
     event.dataTransfer.effectAllowed = "copy";
   }
 
   function handleDrop(event: DragEvent<HTMLDivElement>) {
     event.preventDefault();
 
-    const productId = event.dataTransfer.getData("text/plain");
-    const product = getProduct(productId);
+    const pieceId = event.dataTransfer.getData("text/plain");
+    const piece = getPiece(pieceId);
 
-    if (!product) return;
+    if (!piece) return;
+
+    const slot = piece.category as Slot;
 
     updateOutfit((current) => ({
       ...current,
       slots: {
         ...current.slots,
-        [product.slot]: product.id,
+        [slot]: piece.id,
       },
     }));
 
-    setSelectedSlot(product.slot);
-    setMessage(`${product.name} added.`);
+    setSelectedSlot(slot);
+    setMessage(`${piece.name} added.`);
   }
 
   function changeBackground(background: Background) {
@@ -636,24 +582,36 @@ export function UniformBuilder() {
     }));
   }
 
-  function changeSize(productId: string, size: string) {
-    updateOutfit((current) => ({
-      ...current,
-      sizes: {
-        ...current.sizes,
-        [productId]: size,
-      },
-    }));
-  }
-
   function resetOutfit() {
     updateOutfit(() => ({
       slots: { ...emptySlots },
-      sizes: {},
       background: "bone",
     }));
 
     setMessage("Canvas cleared.");
+  }
+
+  function randomOutfit() {
+    const shuffled = [...pieces].sort(
+      () => Math.random() - 0.5,
+    );
+
+    const slots: OutfitSlots = { ...emptySlots };
+
+    for (const piece of shuffled) {
+      const slot = piece.category as Slot;
+
+      if (!slots[slot]) {
+        slots[slot] = piece.id;
+      }
+    }
+
+    updateOutfit((current) => ({
+      ...current,
+      slots,
+    }));
+
+    setMessage("A new combination.");
   }
 
   // ------------------------------------------------
@@ -664,7 +622,10 @@ export function UniformBuilder() {
     setSavedOutfits(updated);
 
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(updated),
+      );
     } catch {
       setMessage("Couldn't save outfits on this device.");
     }
@@ -687,12 +648,13 @@ export function UniformBuilder() {
       id: crypto.randomUUID(),
       name: outfitName.trim(),
       slots: { ...outfit.slots },
-      sizes: { ...outfit.sizes },
       background: outfit.background,
       createdAt: Date.now(),
     };
 
-    persistSavedOutfits([saved, ...savedOutfits].slice(0, 12));
+    persistSavedOutfits(
+      [saved, ...savedOutfits].slice(0, 12),
+    );
 
     setSaveDialog(false);
     setMessage("Your uniform has been saved.");
@@ -701,7 +663,6 @@ export function UniformBuilder() {
   function loadOutfit(saved: SavedOutfit) {
     updateOutfit(() => ({
       slots: { ...emptySlots, ...saved.slots },
-      sizes: saved.sizes ?? {},
       background: saved.background ?? "bone",
     }));
 
@@ -712,8 +673,9 @@ export function UniformBuilder() {
 
   function deleteOutfit(id: string) {
     persistSavedOutfits(
-      savedOutfits.filter((outfit) => outfit.id !== id),
+      savedOutfits.filter((item) => item.id !== id),
     );
+
     setMessage("Saved outfit deleted.");
   }
 
@@ -727,17 +689,11 @@ export function UniformBuilder() {
       return;
     }
 
-    const payload = {
-      slots: outfit.slots,
-      sizes: outfit.sizes,
-      background: outfit.background,
-    };
-
     const url = new URL(window.location.href);
 
     url.searchParams.set(
       "outfit",
-      btoa(JSON.stringify(payload)),
+      encodeOutfit(outfit),
     );
 
     try {
@@ -752,41 +708,22 @@ export function UniformBuilder() {
   // BAG
   // ------------------------------------------------
 
-  function addOutfitToBag() {
-    if (selectedProducts.length === 0) {
-      setMessage("Add a piece to your outfit first.");
-      return;
-    }
-
-    if (missingSizes.length > 0) {
-      setMessage(
-        `Choose a size for ${missingSizes[0].product.name}.`,
-      );
-      setShowReview(true);
-      return;
-    }
-
-    selectedProducts.forEach(({ product }) => {
-      const size = outfit.sizes[product.id];
-
-      if (!size) return;
-
-      addItem(
-        {
-          id: product.id,
-          name: product.name,
-          slug: product.slug,
-          color: product.color,
-          colorHex: product.colorHex,
-        },
-        size,
-      );
-    });
-
-    setMessage(
-      `${selectedProducts.length} piece${selectedProducts.length === 1 ? "" : "s"} added to your bag.`,
-    );
+  function handleAddToBag() {
+  if (selectedProducts.length === 0) {
+    setMessage("Add at least one piece first.");
+    return;
   }
+
+  selectedProducts.forEach(({ piece }) => {
+    addItem(piece);
+  });
+
+  setMessage(
+    `${selectedProducts.length} ${
+      selectedProducts.length === 1 ? "piece" : "pieces"
+    } added to bag.`,
+  );
+}
 
   // ------------------------------------------------
   // LOADING
@@ -797,6 +734,7 @@ export function UniformBuilder() {
       <div className="lvry-container py-16">
         <div className="animate-pulse space-y-6">
           <div className="h-10 w-64 bg-[#E6E0D6]" />
+
           <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
             <div className="aspect-[4/4.5] bg-[#E6E0D6]" />
             <div className="h-[500px] bg-[#E6E0D6]" />
@@ -840,6 +778,7 @@ export function UniformBuilder() {
             >
               <Layers size={14} />
               My uniforms
+
               <span className="font-mono text-muted">
                 {savedOutfits.length}
               </span>
@@ -866,8 +805,9 @@ export function UniformBuilder() {
           <div className="mb-4 flex items-center justify-between">
             <div>
               <p className="eyebrow">01 / THE CANVAS</p>
+
               <p className="mt-1 text-xs text-muted">
-                {selectedProducts.length} of 4 pieces
+                {selectedProducts.length} of 5 pieces
               </p>
             </div>
 
@@ -898,6 +838,15 @@ export function UniformBuilder() {
 
               <button
                 type="button"
+                onClick={randomOutfit}
+                className="inline-flex items-center gap-2 px-2 py-2 text-[11px] text-muted transition hover:text-ink"
+              >
+                <Shuffle size={13} />
+                Random
+              </button>
+
+              <button
+                type="button"
                 onClick={resetOutfit}
                 className="inline-flex items-center gap-2 px-2 py-2 text-[11px] text-muted transition hover:text-ink"
               >
@@ -923,17 +872,21 @@ export function UniformBuilder() {
 
             {/* Canvas metadata */}
 
-            <div className="absolute left-5 top-5 z-50">
+            <div className="absolute left-5 top-5 z-[60]">
               <p className="font-mono text-[9px] tracking-[0.16em] opacity-60">
                 LVRY / DAILY STUDY
               </p>
-              <p className="mt-1 text-xs">Uniform no. 01</p>
+
+              <p className="mt-1 text-xs">
+                Uniform no. 01
+              </p>
             </div>
 
-            <div className="absolute right-5 top-5 z-50 text-right">
+            <div className="absolute right-5 top-5 z-[60] text-right">
               <p className="font-mono text-[9px] tracking-[0.16em] opacity-60">
                 THE EVERYDAY UNIFORM
               </p>
+
               <p className="mt-1 text-xs">
                 {selectedProducts.length} pieces
               </p>
@@ -942,20 +895,22 @@ export function UniformBuilder() {
             {/* Garments */}
 
             {(Object.keys(slotLabels) as Slot[]).map((slot) => {
-              const product = getProduct(outfit.slots[slot]);
+              const piece = getPiece(outfit.slots[slot]);
               const active = selectedSlot === slot;
 
               return (
                 <div
                   key={slot}
                   className={`absolute ${slotPositions[slot]} flex min-h-[90px] items-center justify-center transition-all duration-500 ${
-                    active ? "z-50" : ""
+                    active ? "z-[55]" : ""
                   }`}
                 >
-                  {product ? (
+                  {piece ? (
                     <div
                       className={`group relative w-full transition-all duration-300 ${
-                        active ? "scale-[1.025]" : "hover:scale-[1.025]"
+                        active
+                          ? "scale-[1.025]"
+                          : "hover:scale-[1.025]"
                       }`}
                     >
                       <button
@@ -964,16 +919,20 @@ export function UniformBuilder() {
                           setSelectedSlot(slot);
                           setActiveCategory(slot);
                         }}
-                        aria-label={`Inspect ${product.name}`}
-                        className={`block w-full ${
+                        aria-label={`Inspect ${piece.name}`}
+                        className={`relative block aspect-[4/4.5] w-full ${
                           active
                             ? "outline outline-1 outline-dashed outline-current/40 outline-offset-2"
                             : ""
                         }`}
                       >
-                        <GarmentArtwork
-                          product={product}
-                          className="h-auto w-full drop-shadow-[3px_7px_4px_rgba(17,17,17,0.12)]"
+                        <Image
+                          src={piece.image}
+                          alt={piece.name}
+                          fill
+                          sizes="(max-width: 1024px) 45vw, 400px"
+                          className="object-contain drop-shadow-[3px_7px_4px_rgba(17,17,17,0.12)]"
+                          draggable={false}
                         />
                       </button>
 
@@ -984,12 +943,12 @@ export function UniformBuilder() {
                             : "opacity-0 group-hover:opacity-100"
                         }`}
                       >
-                        {product.name}
+                        {piece.name}
 
                         <button
                           type="button"
-                          onClick={() => removeProduct(slot)}
-                          aria-label={`Remove ${product.name}`}
+                          onClick={() => removePiece(slot)}
+                          aria-label={`Remove ${piece.name}`}
                           className="border-l border-border pl-2 text-muted hover:text-signal"
                         >
                           <X size={11} />
@@ -1004,10 +963,13 @@ export function UniformBuilder() {
                         setActiveCategory(slot);
                       }}
                       className={`flex w-full flex-col items-center justify-center gap-2 border border-dashed border-current/30 py-5 text-center transition hover:border-current/70 hover:bg-black/[0.025] ${
-                        active ? "border-current/70 bg-black/[0.025]" : ""
+                        active
+                          ? "border-current/70 bg-black/[0.025]"
+                          : ""
                       }`}
                     >
                       <Plus size={17} strokeWidth={1.5} />
+
                       <span className="font-mono text-[9px] uppercase tracking-wider">
                         Add {slotLabels[slot]}
                       </span>
@@ -1019,15 +981,20 @@ export function UniformBuilder() {
 
             {/* Canvas footer */}
 
-            <div className="absolute bottom-5 left-5 z-50">
-              <p className="handwritten text-xl">Made to repeat.</p>
+            <div className="absolute bottom-5 left-5 z-[60]">
+              <p className="handwritten text-xl">
+                Made to repeat.
+              </p>
             </div>
 
-            <div className="absolute bottom-5 right-5 z-50 text-right">
+            <div className="absolute bottom-5 right-5 z-[60] text-right">
               <p className="font-mono text-[9px] tracking-widest opacity-60">
                 LVRY / 001
               </p>
-              <p className="mt-1 text-[10px]">Pieces of a uniform.</p>
+
+              <p className="mt-1 text-[10px]">
+                Pieces of a uniform.
+              </p>
             </div>
 
             {selectedProducts.length === 0 && (
@@ -1044,6 +1011,7 @@ export function UniformBuilder() {
           <div className="mt-5 flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="eyebrow">Canvas material</p>
+
               <p className="mt-1 text-xs text-muted">
                 Change the paper, not the clothes.
               </p>
@@ -1145,19 +1113,29 @@ export function UniformBuilder() {
 
           {/* PRODUCT GRID */}
 
-          <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4">
-            {visibleProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                isSelected={outfit.slots[product.slot] === product.id}
-                onSelect={() => selectProduct(product)}
-                onDragStart={(event) =>
-                  handleDragStart(event, product)
-                }
-              />
-            ))}
-          </div>
+          {visibleProducts.length === 0 ? (
+            <div className="border border-dashed border-border px-4 py-12 text-center">
+              <p className="text-xs">
+                No pieces in this category.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-4">
+              {visibleProducts.map((piece) => (
+                <ProductCard
+                  key={piece.id}
+                  piece={piece}
+                  isSelected={
+                    outfit.slots[piece.category as Slot] === piece.id
+                  }
+                  onSelect={() => selectPiece(piece)}
+                  onDragStart={(event) =>
+                    handleDragStart(event, piece)
+                  }
+                />
+              ))}
+            </div>
+          )}
 
           {/* SELECTION SUMMARY */}
 
@@ -1165,13 +1143,14 @@ export function UniformBuilder() {
             <div className="mb-4 flex items-center justify-between">
               <div>
                 <p className="eyebrow">03 / YOUR UNIFORM</p>
+
                 <p className="mt-1 text-xs text-muted">
                   Everything you've picked.
                 </p>
               </div>
 
               <span className="font-mono text-[10px] text-muted">
-                {selectedProducts.length} / 4
+                {selectedProducts.length} / 5
               </span>
             </div>
 
@@ -1182,65 +1161,47 @@ export function UniformBuilder() {
                   className="mx-auto mb-3 text-muted"
                   strokeWidth={1.5}
                 />
-                <p className="text-xs">Your uniform starts here.</p>
+
+                <p className="text-xs">
+                  Your uniform starts here.
+                </p>
+
                 <p className="mt-1 text-[10px] text-muted">
                   Pick a piece from the collection.
                 </p>
               </div>
             ) : (
               <div className="space-y-3">
-                {selectedProducts.map(({ slot, product }) => (
+                {selectedProducts.map(({ slot, piece }) => (
                   <div
-                    key={product.id}
+                    key={piece.id}
                     className="flex items-center gap-3 border-b border-border pb-3 last:border-0"
                   >
-                    <div className="flex h-[65px] w-[55px] shrink-0 items-center justify-center bg-[#F2EFEA] p-2">
-                      <GarmentArtwork
-                        product={product}
-                        className="h-full w-full"
+                    <div className="relative h-[65px] w-[55px] shrink-0 bg-[#F2EFEA] p-2">
+                      <Image
+                        src={piece.image}
+                        alt={piece.name}
+                        fill
+                        sizes="55px"
+                        className="object-contain p-1"
                       />
                     </div>
 
                     <div className="min-w-0 flex-1">
                       <p className="text-xs font-medium">
-                        {product.name}
+                        {piece.name}
                       </p>
 
                       <p className="mt-1 font-mono text-[9px] text-muted">
-                        {slotLabels[slot]} / {product.color}
+                        {slotLabels[slot]} /{" "}
+                        {getCollectionName(piece.collection)}
                       </p>
-
-                      <div className="mt-2 flex items-center gap-2">
-                        <label
-                          htmlFor={`size-${product.id}`}
-                          className="font-mono text-[9px] text-muted"
-                        >
-                          SIZE
-                        </label>
-
-                        <select
-                          id={`size-${product.id}`}
-                          value={outfit.sizes[product.id] ?? ""}
-                          onChange={(event) =>
-                            changeSize(product.id, event.target.value)
-                          }
-                          className="min-w-[76px] border border-border bg-transparent px-2 py-1 text-[10px] outline-none transition focus:border-ink"
-                        >
-                          <option value="">Choose</option>
-
-                          {product.sizes.map((size) => (
-                            <option key={size} value={size}>
-                              {size}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
                     </div>
 
                     <button
                       type="button"
-                      onClick={() => removeProduct(slot)}
-                      aria-label={`Remove ${product.name}`}
+                      onClick={() => removePiece(slot)}
+                      aria-label={`Remove ${piece.name}`}
                       className="p-2 text-muted transition hover:text-signal"
                     >
                       <Trash2 size={14} />
@@ -1263,6 +1224,7 @@ export function UniformBuilder() {
               <ArrowDown size={14} />
               Review your uniform
             </span>
+
             <ArrowRight size={14} />
           </button>
 
@@ -1271,11 +1233,10 @@ export function UniformBuilder() {
           <div className="mt-3">
             <button
               type="button"
-              onClick={addOutfitToBag}
+              onClick={handleAddToBag}
               disabled={selectedProducts.length === 0}
               className="flex w-full items-center justify-center gap-2 bg-ink px-5 py-4 text-xs text-bone transition hover:bg-signal hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
             >
-              <ShoppingBag size={15} />
               Add uniform to bag
               <span className="font-mono">
                 ({selectedProducts.length})
@@ -1283,16 +1244,13 @@ export function UniformBuilder() {
             </button>
 
             <p className="mt-3 text-center text-[10px] leading-5 text-muted">
-              Choose a size for each piece before adding.
-              No payment is processed here.
+              No size selection is required for these pieces.
             </p>
           </div>
         </section>
       </div>
 
-      {/* ---------------------------------------------- */}
       {/* REVIEW DIALOG */}
-      {/* ---------------------------------------------- */}
 
       {showReview && (
         <div
@@ -1311,15 +1269,19 @@ export function UniformBuilder() {
           >
             <div className="mb-6 flex items-start justify-between">
               <div>
-                <p className="eyebrow">LVRY / YOUR SELECTION</p>
+                <p className="eyebrow">
+                  LVRY / YOUR SELECTION
+                </p>
+
                 <h2
                   id="review-title"
                   className="display-heading mt-2 text-3xl"
                 >
                   The final edit.
                 </h2>
+
                 <p className="mt-2 text-xs text-muted">
-                  Check your pieces and choose your sizes.
+                  Check the pieces you've selected.
                 </p>
               </div>
 
@@ -1334,88 +1296,79 @@ export function UniformBuilder() {
             </div>
 
             <div className="space-y-4">
-              {selectedProducts.map(({ slot, product }) => (
+              {selectedProducts.map(({ slot, piece }) => (
                 <div
-                  key={product.id}
+                  key={piece.id}
                   className="flex items-center gap-4 border-b border-border pb-4"
                 >
-                  <div className="flex h-20 w-16 shrink-0 items-center justify-center bg-[#EFEBE4] p-2">
-                    <GarmentArtwork
-                      product={product}
-                      className="h-full w-full"
+                  <div className="relative h-20 w-16 shrink-0 bg-[#EFEBE4] p-2">
+                    <Image
+                      src={piece.image}
+                      alt={piece.name}
+                      fill
+                      sizes="64px"
+                      className="object-contain p-1"
                     />
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium">{product.name}</p>
-                    <p className="mt-1 font-mono text-[10px] text-muted">
-                      {slotLabels[slot]} / {product.color}
+                    <p className="text-sm font-medium">
+                      {piece.name}
                     </p>
 
-                    <div className="mt-3 flex items-center gap-3">
-                      <label
-                        htmlFor={`review-size-${product.id}`}
-                        className="font-mono text-[9px] text-muted"
-                      >
-                        SIZE
-                      </label>
+                    <p className="mt-1 font-mono text-[10px] text-muted">
+                      {slotLabels[slot]} /{" "}
+                      {getCollectionName(piece.collection)}
+                    </p>
 
-                      <select
-                        id={`review-size-${product.id}`}
-                        value={outfit.sizes[product.id] ?? ""}
-                        onChange={(event) =>
-                          changeSize(product.id, event.target.value)
-                        }
-                        className="border border-border bg-transparent px-3 py-1.5 text-xs outline-none focus:border-ink"
-                      >
-                        <option value="">Choose size</option>
-                        {product.sizes.map((size) => (
-                          <option key={size} value={size}>
-                            {size}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
+                    <Link
+                      href={`/shop/${piece.id}`}
+                      className="mt-2 inline-block text-[10px] underline underline-offset-4"
+                    >
+                      View piece
+                    </Link>
                   </div>
 
-                  {outfit.sizes[product.id] && (
-                    <Check size={15} className="text-muted" />
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => removePiece(slot)}
+                    aria-label={`Remove ${piece.name}`}
+                    className="p-2 text-muted hover:text-signal"
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
               ))}
             </div>
 
             <div className="mt-6 flex items-center justify-between text-xs">
-              <span className="text-muted">Pieces selected</span>
+              <span className="text-muted">
+                Pieces selected
+              </span>
+
               <span className="font-mono">
-                {selectedProducts.length} / 4
+                {selectedProducts.length} / 5
               </span>
             </div>
 
-            {missingSizes.length > 0 && (
-              <p className="mt-4 text-[11px] text-muted">
-                Choose a size for all {missingSizes.length} remaining
-                {missingSizes.length === 1 ? " piece" : " pieces"}.
-              </p>
-            )}
+            <p className="mt-5 text-[11px] leading-5 text-muted">
+  Your selected pieces will be added to your bag.
+  Product sizing and availability are not currently specified.
+</p>
 
             <button
               type="button"
-              onClick={addOutfitToBag}
-              disabled={missingSizes.length > 0}
-              className="mt-6 flex w-full items-center justify-center gap-2 bg-ink px-5 py-4 text-xs text-bone transition hover:bg-signal hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
+              onClick={() => setShowReview(false)}
+              className="mt-6 flex w-full items-center justify-center gap-2 bg-ink px-5 py-4 text-xs text-bone transition hover:bg-signal hover:text-ink"
             >
-              <ShoppingBag size={15} />
-              Add everything to bag
+              Back to the canvas
               <ArrowRight size={14} />
             </button>
           </section>
         </div>
       )}
 
-      {/* ---------------------------------------------- */}
       {/* SAVE DIALOG */}
-      {/* ---------------------------------------------- */}
 
       {saveDialog && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]">
@@ -1426,7 +1379,10 @@ export function UniformBuilder() {
             className="w-full max-w-md bg-[#F8F6F2] p-6 shadow-2xl md:p-8"
           >
             <div className="mb-6 flex items-center justify-between">
-              <p className="eyebrow">KEEP SOMETHING GOOD</p>
+              <p className="eyebrow">
+                KEEP SOMETHING GOOD
+              </p>
+
               <button
                 type="button"
                 onClick={() => setSaveDialog(false)}
@@ -1459,7 +1415,9 @@ export function UniformBuilder() {
               id="outfit-name"
               autoFocus
               value={outfitName}
-              onChange={(event) => setOutfitName(event.target.value)}
+              onChange={(event) =>
+                setOutfitName(event.target.value)
+              }
               onKeyDown={(event) => {
                 if (event.key === "Enter") confirmSave();
               }}
@@ -1491,9 +1449,7 @@ export function UniformBuilder() {
         </div>
       )}
 
-      {/* ---------------------------------------------- */}
       {/* SAVED OUTFITS */}
-      {/* ---------------------------------------------- */}
 
       {showSaved && (
         <div
@@ -1512,13 +1468,17 @@ export function UniformBuilder() {
           >
             <div className="flex items-start justify-between border-b border-border p-6">
               <div>
-                <p className="eyebrow">YOUR PERSONAL COLLECTION</p>
+                <p className="eyebrow">
+                  YOUR PERSONAL COLLECTION
+                </p>
+
                 <h2
                   id="saved-title"
                   className="display-heading mt-2 text-3xl"
                 >
                   Saved uniforms.
                 </h2>
+
                 <p className="mt-2 text-xs text-muted">
                   Stored on this device.
                 </p>
@@ -1542,9 +1502,11 @@ export function UniformBuilder() {
                     strokeWidth={1}
                     className="mb-5 text-muted"
                   />
+
                   <h3 className="display-heading text-2xl">
                     Nothing here yet.
                   </h3>
+
                   <p className="mt-2 max-w-[220px] text-xs leading-5 text-muted">
                     Save an outfit you love and it will find a home here.
                   </p>
@@ -1558,10 +1520,10 @@ export function UniformBuilder() {
                         string | null,
                       ][]
                     )
-                      .map(([, id]) => getProduct(id))
+                      .map(([, id]) => getPiece(id))
                       .filter(
-                        (product): product is Product =>
-                          product !== undefined,
+                        (piece): piece is Piece =>
+                          piece !== undefined,
                       );
 
                     return (
@@ -1574,6 +1536,7 @@ export function UniformBuilder() {
                             <h3 className="text-sm font-medium">
                               {saved.name}
                             </h3>
+
                             <p className="mt-1 font-mono text-[9px] text-muted">
                               {savedProducts.length} PIECES
                             </p>
@@ -1590,14 +1553,17 @@ export function UniformBuilder() {
                         </div>
 
                         <div className="flex gap-2">
-                          {savedProducts.map((product) => (
+                          {savedProducts.map((piece) => (
                             <div
-                              key={product.id}
-                              className="flex h-16 w-14 items-center justify-center bg-[#EFEBE4] p-2"
+                              key={piece.id}
+                              className="relative flex h-16 w-14 items-center justify-center bg-[#EFEBE4] p-2"
                             >
-                              <GarmentArtwork
-                                product={product}
-                                className="h-full w-full"
+                              <Image
+                                src={piece.image}
+                                alt={piece.name}
+                                fill
+                                sizes="56px"
+                                className="object-contain p-1"
                               />
                             </div>
                           ))}
@@ -1621,9 +1587,7 @@ export function UniformBuilder() {
         </div>
       )}
 
-      {/* ---------------------------------------------- */}
       {/* TOAST FEEDBACK */}
-      {/* ---------------------------------------------- */}
 
       {message && (
         <div

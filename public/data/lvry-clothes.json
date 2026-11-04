@@ -1,0 +1,123 @@
+{
+  "pieces": [
+    {
+      "id": "olive-green-long-sleeve-tshirt",
+      "name": "Olive Green Long-Sleeve T-Shirt",
+      "category": "top",
+      "collection": "college-student",
+      "image": "/collections/college-student/1/olive_green_long_sleeve_tshirt.png"
+    },
+    {
+      "id": "beige-crewneck-sweatshirt",
+      "name": "Beige Crewneck Sweatshirt",
+      "category": "layer",
+      "collection": "college-student",
+      "image": "/collections/college-student/1/beige_crewneck_sweatshirt.png"
+    },
+    {
+      "id": "off-white-short-sleeve-tshirt",
+      "name": "Off-White Short-Sleeve T-Shirt",
+      "category": "top",
+      "collection": "college-student",
+      "image": "/collections/college-student/1/off_white_short_sleeve_tshirt.png"
+    },
+    {
+      "id": "tan-pleated-chinos",
+      "name": "Tan Pleated Chinos",
+      "category": "bottom",
+      "collection": "college-student",
+      "image": "/collections/college-student/1/tan_pleated_chinos.png"
+    },
+    {
+      "id": "canvas-tote-bag",
+      "name": "Canvas Tote Bag",
+      "category": "accessory",
+      "collection": "college-student",
+      "image": "/collections/college-student/1/canvas_tote_bag.png"
+    },
+    {
+      "id": "dark-blue-denim-jeans",
+      "name": "Dark Blue Denim Jeans",
+      "category": "bottom",
+      "collection": "college-student",
+      "image": "/collections/college-student/1/dark_blue_denim_jeans.png"
+    },
+    {
+      "id": "black-zip-up-jacket",
+      "name": "Black Zip-Up Jacket",
+      "category": "outerwear",
+      "collection": "college-student",
+      "image": "/collections/college-student/1/black_zip_up_jacket.png"
+    },
+    {
+      "id": "blue-button-down-overshirt",
+      "name": "Blue Button-Down Overshirt",
+      "category": "layer",
+      "collection": "college-student",
+      "image": "/collections/college-student/1/blue_button_down_overshirt.png"
+    },
+    {
+      "id": "brown-short-sleeve-knit-polo",
+      "name": "Brown Short-Sleeve Knit Polo",
+      "category": "top",
+      "collection": "going-on-a-date",
+      "image": "/collections/going-on-a-date/1/brown_short_sleeve_knit_polo.png"
+    },
+    {
+      "id": "olive-green-button-up-cardigan",
+      "name": "Olive Green Button-Up Cardigan",
+      "category": "layer",
+      "collection": "going-on-a-date",
+      "image": "/collections/going-on-a-date/1/olive_green_button_up_cardigan.png"
+    },
+    {
+      "id": "light-blue-long-sleeve-button-down-shirt",
+      "name": "Light Blue Long-Sleeve Button-Down Shirt",
+      "category": "top",
+      "collection": "going-on-a-date",
+      "image": "/collections/going-on-a-date/1/light_blue_long_sleeve_button_down_shirt.png"
+    },
+    {
+      "id": "dark-brown-pleated-trousers",
+      "name": "Dark Brown Pleated Trousers",
+      "category": "bottom",
+      "collection": "going-on-a-date",
+      "image": "/collections/going-on-a-date/1/dark_brown_pleated_trousers.png"
+    },
+    {
+      "id": "olive-green-chore-jacket",
+      "name": "Olive Green Chore Jacket",
+      "category": "outerwear",
+      "collection": "going-on-a-date",
+      "image": "/collections/going-on-a-date/1/olive_green_chore_jacket.png"
+    }
+  ],
+  "collections": [
+    {
+      "codename": "college-student",
+      "name": "College Student",
+      "description": "Relaxed, practical everyday pieces for campus, lectures, coffee runs and everything in between.",
+      "style": "Relaxed, practical, layered",
+      "palette": [
+        "bone",
+        "olive",
+        "denim blue",
+        "tan",
+        "black",
+        "oatmeal"
+      ]
+    },
+    {
+      "codename": "going-on-a-date",
+      "name": "Going on a Date",
+      "description": "Comfortable, considered outfits for an evening out, a café or dinner without feeling overdressed.",
+      "style": "Refined, comfortable, considered",
+      "palette": [
+        "espresso brown",
+        "olive",
+        "powder blue",
+        "bone"
+      ]
+    }
+  ]
+}

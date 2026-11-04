@@ -9,6 +9,7 @@ import "./globals.css";
 import { BagProvider } from "@/contexts/bag-context";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { ClothesProvider } from "@/contexts/clothes-context";
 
 const bricolage = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -52,9 +53,11 @@ export default function RootLayout({
     >
       <body>
       <BagProvider>
+        <ClothesProvider>
         <SiteHeader />
       {children}
       <SiteFooter />
+      </ClothesProvider>
       </BagProvider>
       </body>
     </html>

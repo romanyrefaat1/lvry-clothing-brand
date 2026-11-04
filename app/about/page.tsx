@@ -10,6 +10,7 @@ import type {
   ClothingCategory,
   ClothingPiece,
 } from "@/contexts/clothes-context";
+import { Button } from "@/components/button";
 
 const manifesto =
   "We think most people wear the same few things anyway. So we make those things properly, in a small range, and we describe them honestly.";
@@ -480,26 +481,28 @@ export default function AboutPage() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/shop"
-                className="group inline-flex items-center gap-5 bg-[#111111] px-6 py-4 text-sm text-[#EFEBE4] transition-colors hover:bg-[#EFEBE4] hover:text-black"
               >
+                <Button variant="light_bg" className="border-1">
                 Shop the pieces
 
                 <ArrowUpRight
                   size={17}
                   className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
                 />
+                </Button>
               </Link>
 
               <Link
                 href="/build"
-                className="group inline-flex items-center gap-5 border border-black/40 px-6 py-4 text-sm transition-colors hover:bg-black hover:text-white"
               >
+                <Button variant="default" className="hover:border-1">
                 Build a uniform
 
                 <ArrowUpRight
                   size={17}
                   className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
                 />
+                </Button>
               </Link>
             </div>
           </div>

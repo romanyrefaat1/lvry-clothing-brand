@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { useClothes } from "@/contexts/clothes-context";
+import { Button } from "./button";
 
 /* ─────────────────────────────────────────
    SHARED DECORATIVE ELEMENTS
@@ -209,9 +210,10 @@ export function BuilderPreview() {
 
             <Link
               href="/build"
-              className="mt-10 inline-flex min-h-12 items-center gap-8 bg-bone px-5 text-sm text-ink transition-colors hover:bg-signal"
             >
+              <Button variant="light_bg">
               Build a uniform <Arrow diagonal />
+              </Button>
             </Link>
           </div>
 

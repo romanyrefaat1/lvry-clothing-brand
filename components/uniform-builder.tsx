@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useClothes } from "@/contexts/clothes-context";
 import { useBag } from "@/contexts/bag-context";
+import { Button } from "./button";
 
 // --------------------------------------------------
 // TYPES
@@ -784,14 +785,14 @@ export function UniformBuilder() {
               </span>
             </button>
 
-            <button
+            <Button
               type="button"
               onClick={shareOutfit}
               className="inline-flex items-center gap-2 bg-ink px-4 py-3 text-xs text-bone transition hover:bg-signal hover:text-ink"
             >
               <Share2 size={14} />
               Share
-            </button>
+            </Button>
           </div>
         </div>
       </header>
@@ -1095,8 +1096,9 @@ export function UniformBuilder() {
 
           <div className="mb-5 flex gap-1 overflow-x-auto border-b border-border pb-3 [scrollbar-width:none]">
             {categories.map((category) => (
-              <button
+              <Button
                 key={category.id}
+                variant="secondary"
                 type="button"
                 onClick={() => setActiveCategory(category.id)}
                 aria-pressed={activeCategory === category.id}
@@ -1107,7 +1109,7 @@ export function UniformBuilder() {
                 }`}
               >
                 {category.label}
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -1230,18 +1232,18 @@ export function UniformBuilder() {
 
           {/* BAG CTA */}
 
-          <div className="mt-3">
-            <button
-              type="button"
-              onClick={handleAddToBag}
-              disabled={selectedProducts.length === 0}
-              className="flex w-full items-center justify-center gap-2 bg-ink px-5 py-4 text-xs text-bone transition hover:bg-signal hover:text-ink disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Add uniform to bag
-              <span className="font-mono">
-                ({selectedProducts.length})
-              </span>
-            </button>
+            <div className="flex flex-col w-full gap-3 mt-3">
+    <Button
+        variant="default"
+        onClick={handleAddToBag}
+        disabled={selectedProducts.length === 0}
+        className="!flex-1 !justify-center"
+    >
+        Add uniform to bag
+        <span className="font-mono">
+            ({selectedProducts.length})
+        </span>
+    </Button>
 
             <p className="mt-3 text-center text-[10px] leading-5 text-muted">
               No size selection is required for these pieces.

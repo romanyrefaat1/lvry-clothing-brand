@@ -337,14 +337,13 @@ export default function BagPage() {
                 </p>
               </div>
 
-              <button
-                type="button"
-                disabled
+              <Link
+                href={"/checkout"}
                 className="mt-7 flex min-h-12 w-full cursor-not-allowed items-center justify-between bg-ink/40 px-5 text-sm text-bone/70"
               >
-                Checkout unavailable
+                Checkout
                 <span aria-hidden="true">→</span>
-              </button>
+              </Link>
 
               <p className="mt-4 text-center font-mono text-[9px] uppercase leading-5 text-muted">
                 Demo storefront / No orders processed

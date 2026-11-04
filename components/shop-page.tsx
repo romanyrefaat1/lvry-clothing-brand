@@ -16,6 +16,7 @@ import {
 } from "react";
 
 import { useClothes } from "@/contexts/clothes-context";
+import { Button } from "./button";
 
 /* ─────────────────────────────────────────
    TYPES
@@ -414,336 +415,307 @@ export function ShopPage() {
       {/* CATEGORY NAVIGATION */}
 
       <section className="lvry-container">
-        <nav
-          aria-label="Product categories"
-          className="flex gap-6 overflow-x-auto border-b border-border pb-4"
-        >
-          {categories.map((item) => {
+    <nav
+        aria-label="Product categories"
+        className="flex gap-6 overflow-x-auto border-b border-border pb-4"
+    >
+        {categories.map((item) => {
             const active = category === item.value;
 
             return (
-              <button
-                key={item.value || "all"}
-                type="button"
-                onClick={() => updateParam("category", item.value)}
-                aria-pressed={active}
-                className={`shrink-0 text-xs transition-colors ${
-                  active
-                    ? "font-semibold text-ink"
-                    : "text-muted hover:text-ink"
-                }`}
-              >
-                {item.label}
+                <Button
+                    key={item.value || "all"}
+                    variant="light_bg"
+                    type="button"
+                    onClick={() => updateParam("category", item.value)}
+                    aria-pressed={active}
+                    className={`!min-h-0 !shrink-0 !gap-0 !bg-transparent !px-0 text-xs !text-muted hover:!bg-transparent hover:!text-ink ${
+                        active ? "!font-semibold !text-ink" : ""
+                    }`}
+                >
+                    {item.label}
 
-                {active && (
-                  <span className="ml-2 text-signal" aria-hidden="true">
-                    /
-                  </span>
-                )}
-              </button>
+                    {active && (
+                        <span className="ml-2 text-signal" aria-hidden="true">
+                            /
+                        </span>
+                    )}
+                </Button>
             );
-          })}
-        </nav>
-      </section>
+        })}
+    </nav>
+</section>
 
       {/* FILTER TOOLBAR */}
 
-      <section className="lvry-container pt-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-
-          <div className="flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={() => setFiltersOpen((current) => !current)}
-              aria-expanded={filtersOpen}
-              className="flex min-h-10 items-center gap-3 border border-ink px-4 text-xs transition-colors hover:bg-ink hover:text-bone"
+     <section className="lvry-container pt-6">
+    <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center gap-3">
+            <Button
+                variant="secondary"
+                type="button"
+                onClick={() => setFiltersOpen((current) => !current)}
+                aria-expanded={filtersOpen}
             >
-              <span>
                 {filtersOpen ? "Close filters" : "Filter"}
-              </span>
-
-              <span aria-hidden="true">
-                {filtersOpen ? "−" : "+"}
-              </span>
-
-              {activeFilterCount > 0 && (
-                <span className="font-mono text-[10px]">
-                  ({activeFilterCount})
+                <span aria-hidden="true">
+                    {filtersOpen ? "−" : "+"}
                 </span>
-              )}
-            </button>
+
+                {activeFilterCount > 0 && (
+                    <span className="font-mono text-[10px]">
+                        ({activeFilterCount})
+                    </span>
+                )}
+            </Button>
 
             {activeFilterCount > 0 && (
-              <button
-                type="button"
-                onClick={handleClearFilters}
-                className="text-xs text-muted underline underline-offset-4 hover:text-ink"
-              >
-                Clear all
-              </button>
+                <Button
+                    variant="secondary"
+                    type="button"
+                    onClick={handleClearFilters}
+                >
+                    Clear all
+                    <span aria-hidden="true">×</span>
+                </Button>
             )}
-          </div>
+        </div>
 
-          <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
             <label className="flex items-center gap-2">
-              <span className="hidden font-mono text-[9px] uppercase text-muted sm:inline">
-                Sort
-              </span>
+                <span className="hidden font-mono text-[9px] uppercase text-muted sm:inline">
+                    Sort
+                </span>
 
-              <select
-                value={sort}
-                onChange={(event) =>
-                  updateParam("sort", event.target.value)
-                }
-                className="min-h-10 bg-transparent text-xs outline-none"
-                aria-label="Sort products"
-              >
-                {sortOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                <select
+                    value={sort}
+                    onChange={(event) => updateParam("sort", event.target.value)}
+                    className="min-h-10 bg-transparent text-xs outline-none"
+                    aria-label="Sort products"
+                >
+                    {sortOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </select>
             </label>
 
             <div className="hidden h-5 w-px bg-border sm:block" />
 
             {/* VIEW MODES */}
 
-            <div className="flex items-center gap-1" aria-label="Display mode">
-              <button
-                type="button"
-                onClick={() => updateParam("view", "grid")}
-                aria-label="Grid view"
-                aria-pressed={view === "grid"}
-                className={`flex h-9 w-9 items-center justify-center ${
-                  view === "grid"
-                    ? "bg-ink text-bone"
-                    : "text-muted hover:text-ink"
-                }`}
-              >
-                <svg
-                  viewBox="0 0 16 16"
-                  className="h-4 w-4"
-                  fill="currentColor"
-                  aria-hidden="true"
+            <div className="flex items-center gap-2" aria-label="Display mode">
+                <Button
+                    variant="secondary"
+                    type="button"
+                    onClick={() => updateParam("view", "grid")}
+                    aria-label="Grid view"
+                    aria-pressed={view === "grid"}
+                    className="!size-12 !justify-center !gap-0 !p-0"
                 >
-                  <rect x="1" y="1" width="6" height="6" />
-                  <rect x="9" y="1" width="6" height="6" />
-                  <rect x="1" y="9" width="6" height="6" />
-                  <rect x="9" y="9" width="6" height="6" />
-                </svg>
-              </button>
+                    <svg
+                        viewBox="0 0 16 16"
+                        className="h-4 w-4"
+                        fill="currentColor"
+                        aria-hidden="true"
+                    >
+                        <rect x="1" y="1" width="6" height="6" />
+                        <rect x="9" y="1" width="6" height="6" />
+                        <rect x="1" y="9" width="6" height="6" />
+                        <rect x="9" y="9" width="6" height="6" />
+                    </svg>
+                </Button>
 
-              <button
-                type="button"
-                onClick={() => updateParam("view", "list")}
-                aria-label="List view"
-                aria-pressed={view === "list"}
-                className={`flex h-9 w-9 items-center justify-center ${
-                  view === "list"
-                    ? "bg-ink text-bone"
-                    : "text-muted hover:text-ink"
-                }`}
-              >
-                <svg
-                  viewBox="0 0 16 16"
-                  className="h-4 w-4"
-                  fill="currentColor"
-                  aria-hidden="true"
+                <Button
+                    variant="secondary"
+                    type="button"
+                    onClick={() => updateParam("view", "list")}
+                    aria-label="List view"
+                    aria-pressed={view === "list"}
+                    className="!size-12 !justify-center !gap-0 !p-0"
                 >
-                  <rect x="1" y="2" width="14" height="2" />
-                  <rect x="1" y="7" width="14" height="2" />
-                  <rect x="1" y="12" width="14" height="2" />
-                </svg>
-              </button>
+                    <svg
+                        viewBox="0 0 16 16"
+                        className="h-4 w-4"
+                        fill="currentColor"
+                        aria-hidden="true"
+                    >
+                        <rect x="1" y="2" width="14" height="2" />
+                        <rect x="1" y="7" width="14" height="2" />
+                        <rect x="1" y="12" width="14" height="2" />
+                    </svg>
+                </Button>
             </div>
-          </div>
         </div>
+    </div>
 
-        {/* SEARCH */}
+    {/* SEARCH */}
 
-        <div className="mt-6 flex items-center gap-3 border-b border-border pb-3">
-          <svg
+    <div className="mt-6 flex items-center gap-3 border-b border-border pb-3">
+        <svg
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             strokeWidth="1.5"
             className="h-4 w-4 shrink-0 text-muted"
             aria-hidden="true"
-          >
+        >
             <circle cx="11" cy="11" r="7" />
             <path d="m16 16 4 4" />
-          </svg>
+        </svg>
 
-          <input
+        <input
             type="search"
             value={searchInput}
             onChange={(event) => handleSearch(event.target.value)}
             placeholder="Find a piece..."
             aria-label="Search pieces"
             className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted"
-          />
+        />
 
-          {searchInput && (
-            <button
-              type="button"
-              onClick={() => handleSearch("")}
-              className="text-xs text-muted hover:text-ink"
+        {searchInput && (
+            <Button
+                variant="secondary"
+                type="button"
+                onClick={() => handleSearch("")}
             >
-              Clear
-            </button>
-          )}
-        </div>
+                Clear
+            </Button>
+        )}
+    </div>
 
-        {/* FILTER PANEL */}
+    {/* FILTER PANEL */}
 
-        {filtersOpen && (
-          <div className="mt-6 grid gap-8 border-y border-border py-2 sm:grid-cols-2 lg:grid-cols-4">
+    {filtersOpen && (
+        <div className="mt-6 grid gap-8 border-y border-border py-8 sm:grid-cols-2 lg:grid-cols-4">
 
             {/* COLLECTION */}
 
             <FilterGroup title="Collection">
-              <div className="flex flex-col gap-3">
-                <button
-                  type="button"
-                  onClick={() => updateParam("collection", "")}
-                  aria-pressed={!collection}
-                  className={`text-left text-xs ${
-                    !collection ? "font-semibold text-ink" : "text-muted"
-                  }`}
-                >
-                  All collections
-                </button>
+                <div className="flex flex-col items-start gap-3">
+                    <Button
+                        variant="secondary"
+                        type="button"
+                        onClick={() => updateParam("collection", "")}
+                        aria-pressed={!collection}
+                    >
+                        All collections
+                    </Button>
 
-                {collections.map((item) => (
-                  <button
-                    key={item.codename}
-                    type="button"
-                    onClick={() =>
-                      updateParam(
-                        "collection",
-                        collection === item.codename ? "" : item.codename,
-                      )
-                    }
-                    aria-pressed={collection === item.codename}
-                    className={`text-left text-xs ${
-                      collection === item.codename
-                        ? "font-semibold text-ink"
-                        : "text-muted hover:text-ink"
-                    }`}
-                  >
-                    {item.name}
-                  </button>
-                ))}
-              </div>
+                    {collections.map((item) => (
+                        <Button
+                            key={item.codename}
+                            variant="secondary"
+                            type="button"
+                            onClick={() =>
+                                updateParam(
+                                    "collection",
+                                    collection === item.codename ? "" : item.codename,
+                                )
+                            }
+                            aria-pressed={collection === item.codename}
+                        >
+                            {item.name}
+                        </Button>
+                    ))}
+                </div>
             </FilterGroup>
 
             {/* SIZE */}
 
             <FilterGroup title="Size">
-              <div className="flex flex-wrap gap-2">
-                {sizes.map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() =>
-                      updateParam("size", size === item ? "" : item)
-                    }
-                    aria-pressed={size === item}
-                    className={`h-10 min-w-10 border px-3 text-xs ${
-                      size === item
-                        ? "border-ink bg-ink text-bone"
-                        : "border-border hover:border-ink"
-                    }`}
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
+                <div className="flex flex-wrap gap-3">
+                    {sizes.map((item) => (
+                        <Button
+                            key={item}
+                            variant="secondary"
+                            type="button"
+                            onClick={() =>
+                                updateParam("size", size === item ? "" : item)
+                            }
+                            aria-pressed={size === item}
+                        >
+                            {item}
+                        </Button>
+                    ))}
+                </div>
             </FilterGroup>
 
             {/* COLOR */}
 
             <FilterGroup title="Color">
-              <div className="flex flex-wrap gap-2">
-                {colors.map((item) => (
-                  <button
-                    key={item.name}
-                    type="button"
-                    onClick={() =>
-                      updateParam(
-                        "color",
-                        color === item.name ? "" : item.name,
-                      )
-                    }
-                    aria-pressed={color === item.name}
-                    className={`flex items-center gap-2 border px-3 py-2 text-xs ${
-                      color === item.name
-                        ? "border-ink bg-surface"
-                        : "border-transparent hover:border-border"
-                    }`}
-                  >
-                    <span
-                      className="h-3 w-3 rounded-full border border-ink/15"
-                      style={{ backgroundColor: item.hex }}
-                      aria-hidden="true"
-                    />
-
-                    {item.name}
-                  </button>
-                ))}
-              </div>
+                <div className="flex flex-wrap gap-3">
+                    {colors.map((item) => (
+                        <Button
+                            key={item.name}
+                            variant="secondary"
+                            type="button"
+                            onClick={() =>
+                                updateParam(
+                                    "color",
+                                    color === item.name ? "" : item.name,
+                                )
+                            }
+                            aria-pressed={color === item.name}
+                        >
+                            <span
+                                className="h-3 w-3 shrink-0 rounded-full border border-ink/15"
+                                style={{ backgroundColor: item.hex }}
+                                aria-hidden="true"
+                            />
+                            {item.name}
+                        </Button>
+                    ))}
+                </div>
             </FilterGroup>
 
             {/* FIT */}
 
             <FilterGroup title="Fit">
-              <div className="flex flex-wrap gap-2">
-                {fits.map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    onClick={() =>
-                      updateParam("fit", fit === item ? "" : item)
-                    }
-                    aria-pressed={fit === item}
-                    className={`border px-3 py-2 text-xs ${
-                      fit === item
-                        ? "border-ink bg-ink text-bone"
-                        : "border-border hover:border-ink"
-                    }`}
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
+                <div className="flex flex-wrap gap-3">
+                    {fits.map((item) => (
+                        <Button
+                            key={item}
+                            variant="secondary"
+                            type="button"
+                            onClick={() =>
+                                updateParam("fit", fit === item ? "" : item)
+                            }
+                            aria-pressed={fit === item}
+                        >
+                            {item}
+                        </Button>
+                    ))}
+                </div>
             </FilterGroup>
-          </div>
-        )}
+        </div>
+    )}
 
-        {/* ACTIVE FILTERS */}
+    {/* ACTIVE FILTERS */}
 
-        {activeFilters.length > 0 && (
-          <div className="flex flex-wrap items-center gap-2 pt-5">
-            <span className="font-mono text-[9px] uppercase text-muted">
-              Applied:
+    {activeFilters.length > 0 && (
+        <div className="flex flex-wrap items-center gap-3 pt-6">
+            <span className="eyebrow text-muted">
+                Applied filters
             </span>
 
             {activeFilters.map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => updateParam(item.key, "")}
-                className="flex items-center gap-2 border border-border px-2 py-1 text-[10px] hover:border-ink"
-              >
-                {item.label}
-                <span aria-hidden="true">×</span>
-              </button>
+                <Button
+                    key={item.key}
+                    variant="secondary"
+                    type="button"
+                    onClick={() => updateParam(item.key, "")}
+                >
+                    {item.label}
+                    <span className="text-signal" aria-hidden="true">
+                        ×
+                    </span>
+                </Button>
             ))}
-          </div>
-        )}
-      </section>
+        </div>
+    )}
+</section>
 
       {/* PRODUCT GRID */}
 

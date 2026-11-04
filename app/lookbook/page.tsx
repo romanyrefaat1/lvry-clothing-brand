@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { useClothes } from "@/contexts/clothes-context";
+import { Button } from "@/components/button";
 
 type Look = {
   id: string;
@@ -318,20 +319,20 @@ export default function LookbookPage() {
                 </div>
 
                 <div className="hidden items-center gap-2 sm:flex">
-                  <button
+                  <Button
                     onClick={previousLook}
+                    variant="secondary"
                     aria-label="Previous look"
-                    className="flex h-11 w-11 items-center justify-center rounded-full border border-white/70 transition-colors hover:bg-white hover:text-black"
                   >
                     <ArrowLeft size={17} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={nextLook}
+                    variant="secondary"
                     aria-label="Next look"
-                    className="flex h-11 w-11 items-center justify-center rounded-full border border-white/70 transition-colors hover:bg-white hover:text-black"
                   >
                     <ArrowRight size={17} />
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -354,34 +355,55 @@ export default function LookbookPage() {
 
                 <div className="mb-8 mt-10 border-t border-black/15">
                   {activePieces.map((piece, index) => (
-                    <button
-                      key={piece.id}
-                      onClick={() => setSelectedPieceId(piece.id)}
-                      aria-pressed={selectedPieceId === piece.id}
-                      className={`group flex w-full items-center justify-between border-b border-black/15 py-5 text-left transition-colors ${
-                        selectedPieceId === piece.id
-                          ? "bg-black/[0.035]"
-                          : "hover:bg-black/[0.025]"
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <span className="font-mono text-[10px] text-black/35">
-                          0{index + 1}
-                        </span>
-                        <div>
-                          <p className="text-[15px] tracking-[-0.02em]">
-                            {piece.name}
-                          </p>
-                          <p className="mt-1 font-mono text-[9px] tracking-[0.12em] text-black/45">
-                            {categoryLabels[piece.category] ?? piece.category}
-                          </p>
-                        </div>
-                      </div>
+                    <Button
+    key={piece.id}
+    variant="secondary"
+    onClick={() => setSelectedPieceId(piece.id)}
+    aria-pressed={selectedPieceId === piece.id}
+    className={`group flex w-full !min-h-0 items-center justify-between !gap-3 !border-x-0 !border-t-0 !border-b !border-black/15 !px-3 !py-3 text-left transition-all duration-200 ${
+        selectedPieceId === piece.id
+            ? "!bg-ink !text-bone !border-ink !shadow-none"
+            : "hover:!bg-ink hover:!text-bone hover:!border-ink"
+    }`}
+>
+    <div className="flex min-w-0 items-center gap-3">
+        <span
+            className={`font-mono text-[9px] transition-colors ${
+                selectedPieceId === piece.id
+                    ? "text-bone/40"
+                    : "text-muted group-hover:text-bone/40"
+            }`}
+        >
+            0{index + 1}
+        </span>
 
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full border border-black/20 transition-all group-hover:border-black group-hover:bg-black group-hover:text-white">
-                        <ArrowUpRight size={14} />
-                      </span>
-                    </button>
+        <div className="min-w-0">
+            <p className="truncate text-xs tracking-[-0.02em]">
+                {piece.name}
+            </p>
+
+            <p
+                className={`mt-0.5 font-mono text-[8px] tracking-[0.12em] uppercase transition-colors ${
+                    selectedPieceId === piece.id
+                        ? "text-bone/45"
+                        : "text-muted group-hover:text-bone/50"
+                }`}
+            >
+                {categoryLabels[piece.category] ?? piece.category}
+            </p>
+        </div>
+    </div>
+
+    {/* <span
+        className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full border transition-all duration-200 ${
+            selectedPieceId === piece.id
+                ? "border-signal bg-signal text-ink"
+                : "border-black/20 text-ink group-hover:border-signal group-hover:bg-signal group-hover:text-ink"
+        }`}
+    >
+        <ArrowUpRight size={13} />
+    </span> */}
+</Button>
                   ))}
                 </div>
 
@@ -405,19 +427,19 @@ export default function LookbookPage() {
                   </p>
                 )}
 
-                <button
+                <Button
                   onClick={() => setShopPanelOpen(true)}
-                  className="group flex w-full items-center justify-between bg-[#111111] px-5 py-4 text-left text-[#EFEBE4] transition-colors hover:bg-[#FF4A1C] hover:text-[#111111]"
+                  className="group"
                 >
-                  <span className="flex items-center gap-3 text-sm">
-                    <ShoppingBag size={16} strokeWidth={1.5} />
+                  <span className="flex items-center gap-3 ">
+                    {/* <ShoppingBag size={16} strokeWidth={1.5} /> */}
                     Shop this outfit
                   </span>
                   <ArrowUpRight
                     size={17}
                     className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
                   />
-                </button>
+                </Button>
               </div>
 
               {/* LOOK SELECTOR */}
@@ -631,18 +653,23 @@ export default function LookbookPage() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/shop"
-                className="inline-flex items-center gap-4 bg-[#EFEBE4] px-6 py-4 text-sm text-[#111111] transition-colors hover:bg-[#FF4A1C]"
+                // className="inline-flex items-center gap-4 bg-[#EFEBE4] px-6 py-4 text-sm text-[#111111] transition-colors hover:bg-[#FF4A1C]"
               >
-                Shop the pieces
+                <Button variant="light_bg">
+                  Shop the pieces
                 <ArrowUpRight size={16} />
-              </Link>
+              
+                </Button>
+                </Link>
 
               <Link
                 href="/build"
-                className="inline-flex items-center gap-4 border border-white/35 px-6 py-4 text-sm transition-colors hover:border-white hover:bg-white hover:text-black"
+                // className="inline-flex items-center gap-4 border border-white/35 px-6 py-4 text-sm transition-colors hover:border-white hover:bg-white hover:text-black"
               >
-                Build a uniform
+                <Button >
+                  Build a uniform
                 <ArrowUpRight size={16} />
+                </Button>
               </Link>
             </div>
           </div>

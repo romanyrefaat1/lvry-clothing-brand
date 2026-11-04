@@ -5,91 +5,104 @@
       "name": "Olive Green Long-Sleeve T-Shirt",
       "category": "top",
       "collection": "college-student",
-      "image": "/collections/college-student/1/olive_green_long_sleeve_tshirt.png"
+      "image": "/collections/college-student/1/olive_green_long_sleeve_tshirt.png",
+      "price": 32
     },
     {
       "id": "beige-crewneck-sweatshirt",
       "name": "Beige Crewneck Sweatshirt",
       "category": "layer",
       "collection": "college-student",
-      "image": "/collections/college-student/1/beige_crewneck_sweatshirt.png"
+      "image": "/collections/college-student/1/beige_crewneck_sweatshirt.png",
+      "price": 48
     },
     {
       "id": "off-white-short-sleeve-tshirt",
       "name": "Off-White Short-Sleeve T-Shirt",
       "category": "top",
       "collection": "college-student",
-      "image": "/collections/college-student/1/off_white_short_sleeve_tshirt.png"
+      "image": "/collections/college-student/1/off_white_short_sleeve_tshirt.png",
+      "price": 26
     },
     {
       "id": "tan-pleated-chinos",
       "name": "Tan Pleated Chinos",
       "category": "bottom",
       "collection": "college-student",
-      "image": "/collections/college-student/1/tan_pleated_chinos.png"
+      "image": "/collections/college-student/1/tan_pleated_chinos.png",
+      "price": 58
     },
     {
       "id": "canvas-tote-bag",
       "name": "Canvas Tote Bag",
       "category": "accessory",
       "collection": "college-student",
-      "image": "/collections/college-student/1/canvas_tote_bag.png"
+      "image": "/collections/college-student/1/canvas_tote_bag.png",
+      "price": 18
     },
     {
       "id": "dark-blue-denim-jeans",
       "name": "Dark Blue Denim Jeans",
       "category": "bottom",
       "collection": "college-student",
-      "image": "/collections/college-student/1/dark_blue_denim_jeans.png"
+      "image": "/collections/college-student/1/dark_blue_denim_jeans.png",
+      "price": 62
     },
     {
       "id": "black-zip-up-jacket",
       "name": "Black Zip-Up Jacket",
       "category": "outerwear",
       "collection": "college-student",
-      "image": "/collections/college-student/1/black_zip_up_jacket.png"
+      "image": "/collections/college-student/1/black_zip_up_jacket.png",
+      "price": 78
     },
     {
       "id": "blue-button-down-overshirt",
       "name": "Blue Button-Down Overshirt",
       "category": "layer",
       "collection": "college-student",
-      "image": "/collections/college-student/1/blue_button_down_overshirt.png"
+      "image": "/collections/college-student/1/blue_button_down_overshirt.png",
+      "price": 54
     },
     {
       "id": "brown-short-sleeve-knit-polo",
       "name": "Brown Short-Sleeve Knit Polo",
       "category": "top",
       "collection": "going-on-a-date",
-      "image": "/collections/going-on-a-date/1/brown_short_sleeve_knit_polo.png"
+      "image": "/collections/going-on-a-date/1/brown_short_sleeve_knit_polo.png",
+      "price": 42
     },
     {
       "id": "olive-green-button-up-cardigan",
       "name": "Olive Green Button-Up Cardigan",
       "category": "layer",
       "collection": "going-on-a-date",
-      "image": "/collections/going-on-a-date/1/olive_green_button_up_cardigan.png"
+      "image": "/collections/going-on-a-date/1/olive_green_button_up_cardigan.png",
+      "price": 64
     },
     {
       "id": "light-blue-long-sleeve-button-down-shirt",
       "name": "Light Blue Long-Sleeve Button-Down Shirt",
       "category": "top",
       "collection": "going-on-a-date",
-      "image": "/collections/going-on-a-date/1/light_blue_long_sleeve_button_down_shirt.png"
+      "image": "/collections/going-on-a-date/1/light_blue_long_sleeve_button_down_shirt.png",
+      "price": 46
     },
     {
       "id": "dark-brown-pleated-trousers",
       "name": "Dark Brown Pleated Trousers",
       "category": "bottom",
       "collection": "going-on-a-date",
-      "image": "/collections/going-on-a-date/1/dark_brown_pleated_trousers.png"
+      "image": "/collections/going-on-a-date/1/dark_brown_pleated_trousers.png",
+      "price": 68
     },
     {
       "id": "olive-green-chore-jacket",
       "name": "Olive Green Chore Jacket",
       "category": "outerwear",
       "collection": "going-on-a-date",
-      "image": "/collections/going-on-a-date/1/olive_green_chore_jacket.png"
+      "image": "/collections/going-on-a-date/1/olive_green_chore_jacket.png",
+      "price": 88
     }
   ],
   "collections": [

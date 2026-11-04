@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useClothes } from "@/contexts/clothes-context";
+import { Button } from "./button";
 
 export function HomeHero() {
   const { getCollectionPieces } = useClothes();
@@ -50,10 +51,11 @@ export function HomeHero() {
           <div className="mt-9 flex flex-wrap items-center gap-6">
             <Link
               href="/shop"
-              className="inline-flex min-h-12 items-center gap-8 bg-ink px-5 text-sm text-bone transition-colors hover:bg-signal hover:text-ink"
-            >
-              Shop the pieces
+              >
+              <Button>
+                Shop the pieces
               <span aria-hidden="true">↗</span>
+              </Button>
             </Link>
 
             <Link href="/build" className="text-link">

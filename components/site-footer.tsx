@@ -11,11 +11,11 @@ const footerLinks = [
     ],
   },
   {
-    title: "Information",
+    title: "Developer",
     links: [
-      { label: "Contact", href: "/contact" },
-      { label: "Terms", href: "/terms" },
-      { label: "Privacy", href: "/privacy" },
+      { label: "Portfolio", href: "https://romani.vercel.apphttps://romani.vercel.app/#contact" },
+      { label: "Contact", href: "https://romani.vercel.app/#contact" },
+      // { label: "Privacy", href: "/privacy" },
     ],
   },
 ];

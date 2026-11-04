@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
@@ -11,7 +11,6 @@ import {
   ArrowUpRight,
   Check,
   Maximize2,
-  Plus,
   ShoppingBag,
   X,
 } from "lucide-react";
@@ -27,7 +26,7 @@ const categoryLabels: Record<string, string> = {
   accessory: "Accessory",
 };
 
-export default function PiecePage() {
+function PiecePageContent() {
   const params = useParams<{ slug: string }>();
 
   const { pieces, collections } = useClothes();
@@ -36,10 +35,8 @@ export default function PiecePage() {
   const [isImageOpen, setIsImageOpen] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
-  // Find the requested piece using its canonical catalog ID.
   const piece = pieces.find((item) => item.id === params.slug);
 
-  // Handle invalid product URLs.
   if (!piece) {
     return (
       <main className="min-h-screen bg-[#EFEBE4] px-5 py-24 text-[#111111] sm:px-10">
@@ -81,8 +78,7 @@ export default function PiecePage() {
     )
     .slice(0, 4);
 
-  const category =
-    categoryLabels[piece.category] ?? piece.category;
+  const category = categoryLabels[piece.category] ?? piece.category;
 
   function handleAddToBag() {
     if (!isReady) return;
@@ -145,7 +141,7 @@ export default function PiecePage() {
                 className="pointer-events-none absolute inset-0 opacity-[0.12]"
                 style={{
                   backgroundImage:
-                    "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E\")",
+                    'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 180 180\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'.85\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'.4\'/%3E%3C/svg%3E")',
                 }}
               />
 
@@ -224,7 +220,6 @@ export default function PiecePage() {
                 <span className="font-mono text-[9px] tracking-[0.14em] text-black/45">
                   CATEGORY
                 </span>
-
                 <span className="text-sm">{category}</span>
               </div>
 
@@ -232,7 +227,6 @@ export default function PiecePage() {
                 <span className="font-mono text-[9px] tracking-[0.14em] text-black/45">
                   COLLECTION
                 </span>
-
                 <span className="text-sm">
                   {collection?.name ?? piece.collection}
                 </span>
@@ -242,7 +236,6 @@ export default function PiecePage() {
                 <span className="font-mono text-[9px] tracking-[0.14em] text-black/45">
                   PIECE CODE
                 </span>
-
                 <span className="font-mono text-[10px] text-black/60">
                   {piece.id}
                 </span>
@@ -263,7 +256,6 @@ export default function PiecePage() {
                   ) : (
                     <ShoppingBag size={17} />
                   )}
-
                   {isAdded ? "Added. It's in your bag." : "Add to bag"}
                 </span>
 
@@ -277,7 +269,9 @@ export default function PiecePage() {
                 href={`/build?piece=${encodeURIComponent(piece.id)}`}
                 className="group flex min-h-[58px] items-center justify-between border border-black/25 px-6 transition-colors hover:bg-black hover:text-[#EFEBE4]"
               >
-                <span className="text-sm">Build a uniform with this</span>
+                <span className="text-sm">
+                  Build a uniform with this
+                </span>
 
                 <ArrowUpRight
                   size={18}
@@ -305,7 +299,7 @@ export default function PiecePage() {
         </div>
       </section>
 
-      {/* Product information */}
+      {/* Product details */}
       <section className="border-y border-black/15 bg-[#D9D0C2] px-5 py-20 sm:px-10 sm:py-28 lg:px-14">
         <div className="mx-auto grid max-w-[1500px] gap-12 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
@@ -327,51 +321,34 @@ export default function PiecePage() {
 
           <div className="border-t border-black/20">
             <div className="flex items-center justify-between border-b border-black/20 py-6">
-              <span className="text-lg tracking-[-0.04em]">
-                Product name
-              </span>
-
+              <span className="text-lg tracking-[-0.04em]">Product name</span>
               <span className="max-w-[55%] text-right text-sm text-black/55">
                 {piece.name}
               </span>
             </div>
 
             <div className="flex items-center justify-between border-b border-black/20 py-6">
-              <span className="text-lg tracking-[-0.04em]">
-                Category
-              </span>
-
+              <span className="text-lg tracking-[-0.04em]">Category</span>
               <span className="text-sm text-black/55">{category}</span>
             </div>
 
             <div className="flex items-center justify-between border-b border-black/20 py-6">
-              <span className="text-lg tracking-[-0.04em]">
-                Collection
-              </span>
-
+              <span className="text-lg tracking-[-0.04em]">Collection</span>
               <span className="text-sm text-black/55">
                 {collection?.name ?? piece.collection}
               </span>
             </div>
 
             <div className="flex items-center justify-between border-b border-black/20 py-6">
-              <span className="text-lg tracking-[-0.04em]">
-                Measurements
-              </span>
-
-              <span className="text-sm text-black/40">
-                Not specified
-              </span>
+              <span className="text-lg tracking-[-0.04em]">Measurements</span>
+              <span className="text-sm text-black/40">Not specified</span>
             </div>
 
             <div className="flex items-center justify-between border-b border-black/20 py-6">
               <span className="text-lg tracking-[-0.04em]">
                 Fabric and care
               </span>
-
-              <span className="text-sm text-black/40">
-                Not specified
-              </span>
+              <span className="text-sm text-black/40">Not specified</span>
             </div>
 
             <p className="pt-5 font-mono text-[9px] leading-6 tracking-[0.08em] text-black/45">
@@ -583,5 +560,32 @@ export default function PiecePage() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function PiecePage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#EFEBE4] px-5 py-24 text-[#111111] sm:px-10">
+          <div className="mx-auto max-w-[1600px] animate-pulse">
+            <div className="h-4 w-32 bg-black/10" />
+
+            <div className="mt-12 grid gap-10 lg:grid-cols-2">
+              <div className="aspect-[4/5] bg-black/5" />
+
+              <div className="space-y-6">
+                <div className="h-16 w-3/4 bg-black/5" />
+                <div className="h-5 w-1/2 bg-black/5" />
+                <div className="h-32 bg-black/5" />
+                <div className="h-14 bg-black/5" />
+              </div>
+            </div>
+          </div>
+        </main>
+      }
+    >
+      <PiecePageContent />
+    </Suspense>
   );
 }

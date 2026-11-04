@@ -1,4 +1,3 @@
-
 "use client";
 
 import Image from "next/image";
@@ -8,12 +7,17 @@ import { useBag } from "@/contexts/bag-context";
 import { useClothes } from "@/contexts/clothes-context";
 
 import type { ClothingPiece } from "@/contexts/clothes-context";
+import { Button } from "@/components/button";
 
-function BagItemVisual({
-  piece,
-}: {
-  piece: ClothingPiece;
-}) {
+function formatPrice(price: number) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 2,
+  }).format(price);
+}
+
+function BagItemVisual({ piece }: { piece: ClothingPiece }) {
   return (
     <div className="relative flex aspect-[4/5] items-center justify-center overflow-hidden bg-surface">
       {piece.image ? (
@@ -26,9 +30,7 @@ function BagItemVisual({
         />
       ) : (
         <div className="flex flex-col items-center gap-2 text-muted">
-          <span className="font-mono text-2xl">
-            LVRY
-          </span>
+          <span className="font-mono text-2xl">LVRY</span>
           <span className="font-mono text-[9px] uppercase">
             No image
           </span>
@@ -50,8 +52,7 @@ function EmptyBag() {
       </h2>
 
       <p className="mt-5 max-w-xs text-sm leading-6 text-muted">
-        Your bag is empty. Nothing to carry yet.
-        Have a look around.
+        Your bag is empty. Nothing to carry yet. Have a look around.
       </p>
 
       <Link
@@ -80,22 +81,13 @@ function BagItemCard({
   removeItem: (productId: string) => void;
 }) {
   const { product, quantity } = item;
-
   const productHref = `/shop/${product.id}`;
-
-  const categoryName = product.category.replace(
-    /-/g,
-    " ",
-  );
+  const categoryName = product.category.replace(/-/g, " ");
+  const subtotal = product.price * quantity;
 
   return (
-    <article
-      className="grid grid-cols-[104px_1fr] gap-5 border-b border-border py-6 sm:grid-cols-[140px_1fr]"
-    >
-      <Link
-        href={productHref}
-        aria-label={`View ${product.name}`}
-      >
+    <article className="grid grid-cols-[104px_1fr] gap-5 border-b border-border py-6 sm:grid-cols-[140px_1fr]">
+      <Link href={productHref} aria-label={`View ${product.name}`}>
         <BagItemVisual piece={product} />
       </Link>
 
@@ -127,18 +119,17 @@ function BagItemCard({
           </button>
         </div>
 
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div
             className="flex h-9 items-center border border-border"
             aria-label={`Quantity controls for ${product.name}`}
           >
             <button
               type="button"
-              onClick={() =>
-                updateQuantity(product.id, quantity - 1)
-              }
+              onClick={() => updateQuantity(product.id, quantity - 1)}
+              disabled={quantity <= 1}
               aria-label={`Decrease ${product.name} quantity`}
-              className="h-full w-9 text-sm transition-colors hover:bg-ink hover:text-bone"
+              className="h-full w-9 text-sm transition-colors hover:bg-ink hover:text-bone disabled:cursor-not-allowed disabled:opacity-30"
             >
               −
             </button>
@@ -153,9 +144,7 @@ function BagItemCard({
 
             <button
               type="button"
-              onClick={() =>
-                updateQuantity(product.id, quantity + 1)
-              }
+              onClick={() => updateQuantity(product.id, quantity + 1)}
               aria-label={`Increase ${product.name} quantity`}
               className="h-full w-9 text-sm transition-colors hover:bg-ink hover:text-bone"
             >
@@ -163,9 +152,16 @@ function BagItemCard({
             </button>
           </div>
 
-          <span className="font-mono text-[9px] uppercase text-muted">
-            Price not set
-          </span>
+          <div className="text-right">
+            <span className="block font-mono text-xs">
+              {formatPrice(subtotal)}
+            </span>
+            {quantity > 1 && (
+              <span className="mt-1 block font-mono text-[9px] text-muted">
+                {formatPrice(product.price)} / piece
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </article>
@@ -194,10 +190,14 @@ export default function BagPage() {
     );
   }
 
+  const subtotal = items.reduce(
+    (total, item) => total + item.product.price * item.quantity,
+    0
+  );
+
   return (
     <main className="min-h-screen bg-bone">
       <div className="lvry-container pb-24 pt-12 md:pb-32 md:pt-20">
-
         {/* HEADER */}
 
         <div className="flex flex-col justify-between gap-6 border-b border-border pb-10 sm:flex-row sm:items-end">
@@ -206,9 +206,7 @@ export default function BagPage() {
               <span className="font-mono text-[10px] text-signal">
                 06
               </span>
-
               <span className="h-px w-7 bg-border" />
-
               <span className="eyebrow text-muted">
                 YOUR SELECTION
               </span>
@@ -242,7 +240,6 @@ export default function BagPage() {
           <EmptyBag />
         ) : (
           <div className="grid gap-14 pt-10 lg:grid-cols-[1fr_340px] lg:gap-20">
-
             {/* BAG ITEMS */}
 
             <section aria-label="Items in your bag">
@@ -255,7 +252,7 @@ export default function BagPage() {
               <div>
                 {items.map((item) => {
                   const collection = getCollection(
-                    item.product.collection,
+                    item.product.collection
                   );
 
                   const collectionName =
@@ -297,52 +294,48 @@ export default function BagPage() {
               <div className="mt-7 space-y-4 border-y border-border py-5 text-xs">
                 <div className="flex justify-between gap-4">
                   <span className="text-muted">Pieces</span>
-
-                  <span className="font-mono">
-                    {itemCount}
-                  </span>
+                  <span className="font-mono">{itemCount}</span>
                 </div>
 
                 <div className="flex justify-between gap-4">
                   <span className="text-muted">Subtotal</span>
-
                   <span className="font-mono">
-                    Not available
+                    {formatPrice(subtotal)}
                   </span>
                 </div>
 
                 <div className="flex justify-between gap-4">
                   <span className="text-muted">Shipping</span>
-
-                  <span className="font-mono">
-                    Not calculated
-                  </span>
+                  <span className="font-mono">Calculated at checkout</span>
                 </div>
               </div>
 
               <div className="mt-5">
                 <div className="flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium">
-                    Total
-                  </span>
-
+                  <span className="text-sm font-medium">Subtotal</span>
                   <span className="font-mono text-sm">
-                    —
+                    {formatPrice(subtotal)}
                   </span>
                 </div>
 
                 <p className="mt-3 text-xs leading-5 text-muted">
-                  Product prices and shipping details haven't
-                  been configured for this demo.
+                  This is a demo storefront. No real payments or orders
+                  are processed.
                 </p>
               </div>
 
               <Link
-                href={"/checkout"}
-                className="mt-7 flex min-h-12 w-full cursor-not-allowed items-center justify-between bg-ink/40 px-5 text-sm text-bone/70"
+                href="/checkout"
+                aria-label="Proceed to checkout"
+                className="mt-7 block"
               >
-                Checkout
-                <span aria-hidden="true">→</span>
+                <Button
+                  variant="default"
+                  className="flex w-full justify-center"
+                >
+                  Checkout
+                  <span aria-hidden="true">→</span>
+                </Button>
               </Link>
 
               <p className="mt-4 text-center font-mono text-[9px] uppercase leading-5 text-muted">

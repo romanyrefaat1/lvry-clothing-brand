@@ -1,4 +1,3 @@
-
 "use client";
 
 import {
@@ -9,6 +8,7 @@ import {
   type FormEvent,
 } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/button";
 import { useBag, type BagItem } from "@/contexts/bag-context";
 
 type CustomerDetails = {
@@ -53,7 +53,6 @@ const emptyDetails: CustomerDetails = {
   notes: "",
 };
 
-// Adapt these helpers to your ClothingPiece schema if necessary.
 function getProductData(item: BagItem) {
   const product = item.product as unknown as Record<string, unknown>;
 
@@ -62,8 +61,7 @@ function getProductData(item: BagItem) {
     (typeof product.title === "string" && product.title) ||
     item.product.id;
 
-  const rawPrice =
-    product.price
+  const rawPrice = product.price;
 
   const parsedPrice =
     typeof rawPrice === "number"
@@ -135,7 +133,6 @@ export default function CheckoutPage() {
 
   const initialized = useRef(false);
 
-  // Select everything by default, but let the customer deselect pieces.
   useEffect(() => {
     if (!isReady || initialized.current) return;
 
@@ -143,7 +140,6 @@ export default function CheckoutPage() {
     initialized.current = true;
   }, [isReady, items]);
 
-  // Keep selections synchronized if an item is removed from the bag.
   useEffect(() => {
     const bagIds = new Set(items.map((item) => item.product.id));
 
@@ -250,7 +246,6 @@ export default function CheckoutPage() {
         total: subtotal,
       };
 
-      // Save the order BEFORE modifying the bag.
       const previousOrders = getSavedOrders();
 
       localStorage.setItem(
@@ -258,7 +253,6 @@ export default function CheckoutPage() {
         JSON.stringify([order, ...previousOrders]),
       );
 
-      // Remove only the products included in this order.
       selectedItems.forEach((item) => {
         removeItem(item.product.id);
       });
@@ -285,7 +279,6 @@ export default function CheckoutPage() {
     );
   }
 
-  // Empty bag.
   if (items.length === 0 && !completedOrder) {
     return (
       <main className="min-h-[75vh] bg-[#EFEBE4] px-6 py-28 text-[#111]">
@@ -302,18 +295,19 @@ export default function CheckoutPage() {
             Your bag is empty. Find a few pieces and come back.
           </p>
 
-          <button
+          <Button
+            type="button"
+            variant="default"
             onClick={() => router.push("/shop")}
-            className="mt-9 bg-[#111] px-8 py-4 text-xs font-medium uppercase tracking-widest text-[#EFEBE4] transition hover:bg-[#FF4A1C] hover:text-[#111]"
+            className="mt-9 !min-h-0 !px-8 !py-4 text-xs font-medium uppercase tracking-widest"
           >
             Explore the pieces
-          </button>
+          </Button>
         </div>
       </main>
     );
   }
 
-  // Successful checkout.
   if (completedOrder) {
     return (
       <main className="min-h-screen bg-[#EFEBE4] px-5 py-20 text-[#111] md:px-10 md:py-28">
@@ -376,12 +370,14 @@ export default function CheckoutPage() {
             and no payment was collected.
           </p>
 
-          <button
+          <Button
+            type="button"
+            variant="default"
             onClick={() => router.push("/")}
-            className="mt-9 w-full bg-[#111] px-8 py-5 text-xs font-medium uppercase tracking-widest text-[#EFEBE4] transition hover:bg-[#FF4A1C] hover:text-[#111] sm:w-auto"
+            className="mt-9 w-full !min-h-0 px-8 py-5 text-xs font-medium uppercase tracking-widest sm:w-auto"
           >
             Back to LVRY
-          </button>
+          </Button>
         </div>
       </main>
     );
@@ -390,7 +386,6 @@ export default function CheckoutPage() {
   return (
     <main className="min-h-screen bg-[#EFEBE4] px-5 pb-28 pt-12 text-[#111] md:px-10 md:pb-20 md:pt-20">
       <div className="mx-auto max-w-7xl">
-        {/* Page heading */}
         <div className="mb-12 border-b border-black/15 pb-7 md:mb-16">
           <div className="mb-7 flex items-center justify-between">
             <p className="font-mono text-[10px] uppercase tracking-widest text-black/45">
@@ -428,19 +423,20 @@ export default function CheckoutPage() {
 
         {step === 1 ? (
           <div className="grid gap-14 lg:grid-cols-[1fr_340px]">
-            {/* Product selection */}
             <section>
               <div className="mb-5 flex items-center justify-between border-b border-black/15 pb-4">
                 <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">
                   Your bag ({items.length} pieces)
                 </p>
 
-                <button
+                <Button
+                  type="button"
+                  variant="secondary"
                   onClick={toggleAll}
-                  className="text-xs underline underline-offset-4 transition hover:text-[#FF4A1C]"
+                  className="!min-h-0 !border-0 !bg-transparent !px-0 !py-0 !text-xs !shadow-none hover:!translate-y-0 hover:!bg-transparent hover:!text-[#FF4A1C]"
                 >
                   {allSelected ? "Deselect all" : "Select all"}
-                </button>
+                </Button>
               </div>
 
               <div className="divide-y divide-black/15">
@@ -455,9 +451,9 @@ export default function CheckoutPage() {
                         selected ? "opacity-100" : "opacity-45"
                       }`}
                     >
-                      {/* Selection checkbox */}
-                      <button
+                      <Button
                         type="button"
+                        variant="secondary"
                         aria-label={
                           selected
                             ? `Deselect ${data.name}`
@@ -465,18 +461,15 @@ export default function CheckoutPage() {
                         }
                         aria-pressed={selected}
                         onClick={() => toggleItem(data.id)}
-                        className={`mt-2 flex h-5 w-5 shrink-0 items-center justify-center border transition ${
+                        className={`!mt-2 !flex !h-5 !min-h-0 !w-5 !shrink-0 !items-center !justify-center !gap-0 !rounded-none !p-0 !shadow-none hover:!translate-y-0 ${
                           selected
-                            ? "border-[#111] bg-[#111] text-[#EFEBE4]"
-                            : "border-black/35"
+                            ? "!border-[#111] !bg-[#111] !text-[#EFEBE4] hover:!bg-[#111] hover:!text-[#EFEBE4]"
+                            : "!border-black/35 !bg-transparent hover:!bg-black/5"
                         }`}
                       >
-                        {selected && (
-                          <span className="text-xs">✓</span>
-                        )}
-                      </button>
+                        {selected && <span className="text-xs">✓</span>}
+                      </Button>
 
-                      {/* Product image */}
                       <div className="relative aspect-[3/4] w-24 shrink-0 overflow-hidden bg-[#E3DED5] sm:w-32">
                         {data.image ? (
                           <img
@@ -493,7 +486,6 @@ export default function CheckoutPage() {
                         )}
                       </div>
 
-                      {/* Product details */}
                       <div className="flex min-w-0 flex-1 flex-col justify-between gap-4 sm:flex-row sm:items-center">
                         <div>
                           <h2 className="text-sm font-medium sm:text-base">
@@ -505,36 +497,42 @@ export default function CheckoutPage() {
                           </p>
 
                           <div className="mt-4 flex items-center gap-3">
-                            <button
+                            <Button
+                              type="button"
+                              variant="secondary"
                               onClick={() =>
                                 updateQuantity(data.id, item.quantity - 1)
                               }
                               aria-label="Decrease quantity"
-                              className="flex h-7 w-7 items-center justify-center border border-black/20 text-sm transition hover:bg-black hover:text-white"
+                              className="!h-7 !min-h-0 !w-7 !justify-center !gap-0 !rounded-none !border-black/20 !p-0 !text-sm !shadow-none hover:!translate-y-0 hover:!border-black hover:!bg-black hover:!text-white"
                             >
                               −
-                            </button>
+                            </Button>
 
                             <span className="w-5 text-center font-mono text-xs">
                               {item.quantity}
                             </span>
 
-                            <button
+                            <Button
+                              type="button"
+                              variant="secondary"
                               onClick={() =>
                                 updateQuantity(data.id, item.quantity + 1)
                               }
                               aria-label="Increase quantity"
-                              className="flex h-7 w-7 items-center justify-center border border-black/20 text-sm transition hover:bg-black hover:text-white"
+                              className="!h-7 !min-h-0 !w-7 !justify-center !gap-0 !rounded-none !border-black/20 !p-0 !text-sm !shadow-none hover:!translate-y-0 hover:!border-black hover:!bg-black hover:!text-white"
                             >
                               +
-                            </button>
+                            </Button>
 
-                            <button
+                            <Button
+                              type="button"
+                              variant="secondary"
                               onClick={() => removeItem(data.id)}
-                              className="ml-2 text-[10px] uppercase tracking-widest text-black/45 underline underline-offset-4 transition hover:text-[#FF4A1C]"
+                              className="!ml-2 !min-h-0 !border-0 !bg-transparent !px-0 !py-0 !text-[10px] !uppercase !tracking-widest !text-black/45 !shadow-none hover:!translate-y-0 hover:!bg-transparent hover:!text-[#FF4A1C]"
                             >
                               Remove
-                            </button>
+                            </Button>
                           </div>
                         </div>
 
@@ -558,7 +556,6 @@ export default function CheckoutPage() {
               </div>
             </section>
 
-            {/* Order summary */}
             <aside className="h-fit border-t border-black/15 pt-6 lg:sticky lg:top-10 lg:border-t-0">
               <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">
                 Order summary
@@ -599,23 +596,27 @@ export default function CheckoutPage() {
                 </p>
               )}
 
-              <button
+              <Button
+                type="button"
+                variant="default"
                 onClick={continueToDetails}
                 disabled={
                   selectedItems.length === 0 || hasUnavailablePrices
                 }
-                className="mt-8 w-full bg-[#111] px-6 py-5 text-xs font-medium uppercase tracking-widest text-[#EFEBE4] transition hover:bg-[#FF4A1C] hover:text-[#111] disabled:cursor-not-allowed disabled:opacity-30"
+                className="mt-8 w-full !min-h-0 !px-6 !py-5 text-xs font-medium uppercase tracking-widest disabled:!cursor-not-allowed disabled:!opacity-30"
               >
                 Continue with {selectedCount}{" "}
                 {selectedCount === 1 ? "piece" : "pieces"} →
-              </button>
+              </Button>
 
-              <button
+              <Button
+                type="button"
+                variant="secondary"
                 onClick={() => router.push("/shop")}
-                className="mt-5 w-full text-center text-xs text-black/50 underline underline-offset-4 transition hover:text-black"
+                className="mt-5 w-full !min-h-0 !justify-center !border-0 !bg-transparent !px-0 !py-0 !text-center !text-xs !text-black/50 !underline !shadow-none hover:!translate-y-0 hover:!bg-transparent hover:!text-black"
               >
                 Keep looking
-              </button>
+              </Button>
 
               <p className="mt-8 text-center font-mono text-[9px] uppercase leading-5 tracking-wider text-black/40">
                 Checkout demonstration.
@@ -629,7 +630,6 @@ export default function CheckoutPage() {
             onSubmit={placeOrder}
             className="grid gap-14 lg:grid-cols-[1fr_340px]"
           >
-            {/* Customer form */}
             <section className="space-y-12">
               <div>
                 <p className="mb-7 font-mono text-[10px] uppercase tracking-widest text-black/45">
@@ -753,25 +753,26 @@ export default function CheckoutPage() {
               )}
 
               <div className="flex flex-col-reverse gap-5 sm:flex-row sm:items-center">
-                <button
+                <Button
                   type="button"
+                  variant="secondary"
                   onClick={goBack}
-                  className="text-left text-xs text-black/50 underline underline-offset-4 transition hover:text-black"
+                  className="!min-h-0 !justify-start !border-0 !bg-transparent !px-0 !py-0 !text-left !text-xs !text-black/50 !underline !shadow-none hover:!translate-y-0 hover:!bg-transparent hover:!text-black"
                 >
                   ← Back to your selection
-                </button>
+                </Button>
 
-                <button
+                <Button
                   type="submit"
+                  variant="default"
                   disabled={submitting}
-                  className="bg-[#111] px-8 py-5 text-xs font-medium uppercase tracking-widest text-[#EFEBE4] transition hover:bg-[#FF4A1C] hover:text-[#111] disabled:opacity-50 sm:ml-auto"
+                  className="!min-h-0 !px-8 !py-5 text-xs font-medium uppercase tracking-widest disabled:!opacity-50 sm:ml-auto"
                 >
                   {submitting ? "Saving order..." : "Place demo order"}
-                </button>
+                </Button>
               </div>
             </section>
 
-            {/* Summary */}
             <aside className="h-fit border-t border-black/15 pt-6 lg:sticky lg:top-10">
               <p className="font-mono text-[10px] uppercase tracking-widest text-black/50">
                 Your order
@@ -791,6 +792,7 @@ export default function CheckoutPage() {
                           className="h-full w-full object-cover"
                         />
                       )}
+
                       <span className="absolute -right-2 -top-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#111] px-1 font-mono text-[9px] text-white">
                         {item.quantity}
                       </span>
